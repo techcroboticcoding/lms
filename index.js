@@ -13,6 +13,16 @@ app.use(express.static(path.join(__dirname)));
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "index.html"));
 });
+app.get("/admin", (req, res) => {
+    res.sendFile(path.join(__dirname, "admin-dashboard.html"));
+});
+app.get("/student", (req, res) => {
+    res.sendFile(path.join(__dirname, "student-dashboard.html"));
+});
+app.get("/teacher", (req, res) => {
+    res.sendFile(path.join(__dirname, "teacher-dashboard.html"));
+});
+
 
 // Jalankan server
 app.listen(PORT, () => {
