@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Siswa - STREAM LMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Library untuk konversi HTML ke PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        @keyframes moveBackground {
+            0% { background-position: 0 0; }
+            100% { background-position: 60px 60px; }
+        }
+        .tech-bg {
+            background-color: #070a14;
+            background-image: 
+                radial-gradient(rgba(59, 130, 246, 0.12) 1.5px, transparent 1.5px),
+                radial-gradient(rgba(37, 99, 235, 0.08) 1.5px, transparent 1.5px);
+            background-size: 52px 52px;
+            background-position: 0 0, 26px 26px;
+            animation: moveBackground 30s linear infinite;
+        }
+        .collapsed .sidebar-text {
+            display: none !important;
+        }
+        .collapsed {
+            width: 88px !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+
+        /* PENGATURAN PRESISI UKURAN A4 LANDSCAPE (297mm x 210mm) */
+        .page-break {
+            page-break-after: always;
+            break-after: page;
+        }
+        .certificate-sheet {
+            width: 1123px;
+            min-width: 1123px;
+            max-width: 1123px;
+            height: 794px;
+            min-height: 794px;
+            max-height: 794px;
+            background: #ffffff;
+            color: #0f172a;
+            position: relative;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            border: 8px solid #1e3a8a;
+        }
+        .raport-sheet {
+            width: 1123px;
+            min-width: 1123px;
+            max-width: 1123px;
+            height: 794px;
+            min-height: 794px;
+            max-height: 794px;
+            background: #ffffff;
+            color: #0f172a;
+            position: relative;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border: 4px solid #cbd5e1;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="tech-bg min-h-screen text-slate-200 selection:bg-blue-500 selection:text-white flex overflow-x-hidden font-sans">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-72 bg-slate-950/90 backdrop-blur-2xl border-r border-slate-800/60 flex flex-col justify-between p-6 shrink-0 relative z-30 shadow-2xl transition-all duration-300 h-screen sticky top-0">
+        <div class="overflow-y-auto overflow-x-hidden pr-1 space-y-4 flex-1 scrollbar-thin">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3.5 overflow-hidden">
+                    <div class="w-11 h-11 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20 shrink-0">
+                        <i class="fa-solid fa-graduation-cap text-lg"></i>
+                    </div>
+                    <div class="sidebar-text truncate">
+                        <h1 class="text-sm font-bold text-white tracking-wider">STREAM LMS</h1>
+                        <p class="text-[11px] text-slate-400 font-medium">Portal Siswa</p>
+                    </div>
+                </div>
+                <button onclick="toggleSidebarCollapse()" class="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-900 transition shrink-0" title="Buka/Tutup Menu">
+                    <i id="toggle-icon" class="fa-solid fa-chevron-left text-sm transition-transform duration-300"></i>
+                </button>
+            </div>
+
+            <p class="sidebar-text text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Menu Utama</p>
+
+            <nav id="sidebar-nav-container" class="space-y-2">
+                <a href="#" onclick="switchTab('materi')" id="nav-materi" class="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-xs font-semibold bg-blue-600 text-white shadow-xl shadow-blue-600/25 transition-all duration-200">
+                    <div class="w-6 text-center shrink-0"><i class="fa-solid fa-book-open text-sm"></i></div>
+                    <span class="sidebar-text truncate">Modul Materi</span>
+                </a>
+                <a href="#" onclick="switchTab('tugas')" id="nav-tugas" class="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 transition-all duration-200">
+                    <div class="w-6 text-center shrink-0"><i class="fa-solid fa-list-check text-sm"></i></div>
+                    <span class="sidebar-text truncate">Tugas & Evaluasi</span>
+                </a>
+                <a href="#" onclick="switchTab('absensi')" id="nav-absensi" class="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 transition-all duration-200">
+                    <div class="w-6 text-center shrink-0"><i class="fa-solid fa-clipboard-user text-sm"></i></div>
+                    <span class="sidebar-text truncate">Riwayat Absensi</span>
+                </a>
+                <a href="#" onclick="switchTab('sertifikat')" id="nav-sertifikat" class="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 transition-all duration-200">
+                    <div class="w-6 text-center shrink-0"><i class="fa-solid fa-award text-sm"></i></div>
+                    <span class="sidebar-text truncate">Sertifikat Kelulusan</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="pt-4 mt-4 border-t border-slate-800/60 flex items-center justify-between overflow-hidden shrink-0 bg-slate-950/90">
+            <div class="flex items-center gap-3 overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-blue-900/50 border border-blue-700/60 flex items-center justify-center text-blue-400 font-bold text-xs shrink-0" id="sidebar-initials">
+                    ST
+                </div>
+                <div class="sidebar-text truncate">
+                    <p class="text-xs font-semibold text-slate-200 truncate" id="sidebar-name">Memuat...</p>
+                    <p class="text-[10px] text-slate-400 truncate" id="sidebar-class-label">Siswa</p>
+                </div>
+            </div>
+            <button onclick="handleLogout()" class="sidebar-text text-slate-400 hover:text-red-400 p-2.5 rounded-xl hover:bg-red-500/10 transition shrink-0" title="Keluar">
+                <i class="fa-solid fa-right-from-bracket text-sm"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 flex flex-col min-h-screen w-full p-6 sm:p-10 justify-start overflow-y-auto relative">
+        
+        <!-- BANNER PERINGATAN PENDING APPROVAL -->
+        <div id="pending-approval-banner" class="hidden max-w-4xl mx-auto w-full my-auto bg-amber-950/40 border border-amber-500/40 rounded-3xl p-8 shadow-2xl flex flex-col sm:flex-row items-center gap-6 text-amber-200 text-center sm:text-left">
+            <div class="w-16 h-16 rounded-3xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 text-3xl shrink-0 shadow-lg">
+                <i class="fa-solid fa-hourglass-half animate-pulse"></i>
+            </div>
+            <div class="space-y-2">
+                <h3 class="text-lg font-bold text-white uppercase tracking-wider">Akun Menunggu Persetujuan Guru</h3>
+                <p class="text-xs text-amber-200/80 leading-relaxed">Halo <span id="pending-student-name" class="font-bold text-white">Siswa</span>, akun Anda saat ini sedang berstatus <strong>Pending</strong> dan menunggu konfirmasi dari pengajar/mentor.</p>
+            </div>
+        </div>
+
+        <!-- WRAPPER KONTEN UTAMA -->
+        <div id="main-dashboard-content" class="space-y-8 flex-1 hidden">
+            <!-- HEADER -->
+            <div class="max-w-4xl mx-auto w-full mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-3xl p-6 shadow-xl">
+                <div>
+                    <h2 class="text-xl font-bold text-white tracking-tight">Selamat Datang, <span id="welcome-student-name">Siswa</span> 🎓</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Akses materi pembelajaran dan kumpulkan tugas Anda di sini.</p>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-slate-400 bg-slate-900/80 border border-slate-800 px-3.5 py-2 rounded-xl shadow-inner">
+                    <i class="fa-solid fa-book text-[10px] text-blue-400"></i>
+                    <span class="font-medium text-slate-300" id="header-student-class">Kelas: Memuat...</span>
+                </div>
+            </div>
+
+            <main class="max-w-4xl mx-auto w-full space-y-8 flex-1">
+                
+                <!-- SECTION 1: MATERI -->
+                <div id="section-materi" class="space-y-6">
+                    <div class="bg-gradient-to-br from-slate-900/85 via-slate-900/50 to-blue-950/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 relative overflow-hidden shadow-2xl">
+                        <span class="inline-block text-[11px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full mb-3">Modul Pembelajaran</span>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">Materi PDF Kelas Anda</h2>
+                        <p class="text-xs text-slate-400 mt-1">Buka modul materi langsung di dalam web secara eksklusif.</p>
+                    </div>
+                    <div id="student-materials-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 text-center text-slate-400 text-xs col-span-full">Memuat materi...</div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: TUGAS -->
+                <div id="section-tugas" class="space-y-6 hidden">
+                    <div class="bg-gradient-to-br from-slate-900/85 via-slate-900/50 to-indigo-950/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 relative overflow-hidden shadow-2xl">
+                        <span class="inline-block text-[11px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-3 py-1 rounded-full mb-3">Penugasan & Evaluasi</span>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">Daftar Tugas Kelas</h2>
+                        <p class="text-xs text-slate-400 mt-1" id="task-subtitle-desc">Kumpulkan hasil pengerjaan tugas Anda sebelum tenggat waktu.</p>
+                    </div>
+                    <div id="student-tasks-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 text-center text-slate-400 text-xs col-span-full">Memuat tugas...</div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: ABSENSI -->
+                <div id="section-absensi" class="space-y-6 hidden">
+                    <div class="bg-gradient-to-br from-slate-900/80 via-slate-900/50 to-emerald-950/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 relative overflow-hidden shadow-2xl">
+                        <span class="inline-block text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full mb-3">Rekap Kehadiran</span>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">Riwayat Absensi Kehadiran Anda</h2>
+                        <p class="text-xs text-slate-400 mt-1">Pantau catatan kehadiran Anda pada setiap sesi pertemuan.</p>
+                    </div>
+                    <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 shadow-2xl">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-800 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                                        <th class="py-3 px-4">Tanggal Pertemuan</th>
+                                        <th class="py-3 px-4">Hari</th>
+                                        <th class="py-3 px-4 text-center">Status Kehadiran</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="student-attendance-tbody" class="divide-y divide-slate-800/60 text-xs">
+                                    <tr><td colspan="3" class="py-6 text-center text-slate-400">Memuat riwayat absensi...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: SERTIFIKAT -->
+                <div id="section-sertifikat" class="space-y-6 hidden">
+                    <div class="bg-gradient-to-br from-slate-900/85 via-slate-900/50 to-amber-950/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 relative overflow-hidden shadow-2xl">
+                        <span class="inline-block text-[11px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1 rounded-full mb-3">Kelulusan Program</span>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">Sertifikat & Transkrip Nilai</h2>
+                        <p class="text-xs text-slate-400 mt-1">Unduh sertifikat kelulusan resmi Anda setelah dinyatakan lulus oleh pengajar.</p>
+                    </div>
+                    <div id="student-certificate-container" class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 text-center space-y-4 shadow-2xl">
+                        <div class="w-16 h-16 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-center mx-auto text-amber-400 text-2xl">
+                            <i class="fa-solid fa-award"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white">Status Kelulusan & Sertifikat</h3>
+                            <p id="certificate-status-text" class="text-xs text-slate-400 mt-1">Memeriksa status akses sertifikat...</p>
+                        </div>
+                        <div id="certificate-action-area" class="pt-2 flex flex-wrap justify-center gap-3"></div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL VIEWER PDF MATERI -->
+    <div id="material-viewer-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-4xl w-full h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+                <h3 id="viewer-modal-title" class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf text-blue-400"></i> Modul Materi Pembelajaran
+                </h3>
+                <button onclick="closeMaterialViewerModal()" class="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="flex-1 bg-slate-950 p-2 relative flex items-center justify-center">
+                <iframe id="pdf-viewer-iframe" src="" class="w-full h-full rounded-2xl border border-slate-800"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PREVIEW SERTIFIKAT & RAPORT (1 FILE PDF, 2 HALAMAN PAS A4) -->
+    <div id="certificate-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-5xl w-full flex flex-col shadow-2xl overflow-hidden my-auto max-h-[95vh]">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/80">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-award text-amber-400"></i> Pratinjau Dokumen Kelulusan & Transkrip (A4)
+                </h3>
+                <button onclick="closeCertificateModal()" class="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto flex-1 space-y-8 bg-slate-950/40 flex flex-col items-center">
+                
+                <!-- KONTEN UTAMA PAKET DOKUMEN (1 FILE, 2 HALAMAN PAS) -->
+                <div id="printable-package" class="w-full space-y-8 flex flex-col items-center">
+                    
+                    <!-- HALAMAN 1: SERTIFIKAT (UKURAN A4 LANDSCAPE) -->
+                    <div class="certificate-sheet p-12 flex flex-col justify-between text-slate-900 relative shadow-2xl rounded-2xl bg-white page-break">
+                        
+                        <!-- Header Logo -->
+                        <div class="flex justify-between items-center z-10">
+                            <div></div>
+                            <div class="flex items-center justify-center">
+                                <img src="asset/Tech-C Logo.png" alt="Tech-C Logo" class="h-12 object-contain" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'text-blue-950 font-black text-lg tracking-wider\'>TECH-C <span class=\'text-xs font-normal text-slate-600\'>Robotic & Coding</span></div>';">
+                            </div>
+                            <div></div>
+                        </div>
+
+                        <!-- Judul Sertifikat -->
+                        <div class="text-center space-y-1 z-10">
+                            <h2 class="text-3xl font-black text-blue-950 tracking-widest uppercase">SERTIFIKAT</h2>
+                            <p class="text-base font-bold tracking-widest text-amber-600 uppercase">PENGHARGAAN</p>
+                            <p class="text-[11px] font-semibold text-slate-500 pt-1">NO : 141/TECH-C/RB-CD/CLG/V/2026</p>
+                        </div>
+
+                        <!-- Konten & Nama -->
+                        <div class="text-center space-y-3 z-10 my-auto">
+                            <p class="text-xs font-medium text-slate-600 italic">Dengan bangga diberikan kepada:</p>
+                            <h1 id="cert-student-name" class="text-3xl font-black text-slate-900 tracking-wide uppercase border-b-2 border-amber-500/60 pb-1.5 inline-block px-8">NAMA SISWA</h1>
+                            <p class="text-xs text-slate-600 max-w-xl mx-auto pt-1 leading-relaxed">
+                                Sebagai bentuk penghargaan atas pencapaian belajar selama mengikuti Pengembangan Diri Robotik bersama TECH-C, serta menunjukkan kemampuan yang luar biasa. Dengan predikat capaian:
+                            </p>
+                            <div class="pt-1">
+                                <span class="text-lg font-extrabold text-blue-900 bg-blue-50 px-6 py-1 rounded-full border border-blue-200 shadow-sm">Sangat Baik</span>
+                            </div>
+                            <p id="cert-realtime-date" class="text-xs text-slate-500 pt-1">Cilegon, 12 Mei 2026</p>
+                        </div>
+
+                        <!-- Tanda Tangan: Direktur Rizki & Trainer Akun Guru -->
+                        <div class="flex justify-between items-end px-12 z-10 pt-4">
+                            <div class="text-center space-y-4">
+                                <p class="text-xs font-bold text-slate-800">Direktur TECH-C</p>
+                                <div class="h-8"></div>
+                                <div class="border-t border-slate-400 w-44 pt-1">
+                                    <p class="text-[11px] font-extrabold text-blue-950">Rizki Rahayu Pratama</p>
+                                </div>
+                            </div>
+                            <div class="text-center space-y-4">
+                                <p class="text-xs font-bold text-slate-800">Trainer / Mentor</p>
+                                <div class="h-8"></div>
+                                <div class="border-t border-slate-400 w-44 pt-1">
+                                    <p id="cert-trainer-name" class="text-[11px] font-extrabold text-slate-800">Nama Trainer</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- HALAMAN 2: FULL TRANSKRIP NILAI & LOGO (UKURAN A4 LANDSCAPE) -->
+                    <div class="raport-sheet p-12 flex flex-col justify-between text-slate-900 shadow-2xl rounded-2xl bg-white">
+                        <div class="space-y-6">
+                            <!-- Header Raport (Logo & Informasi Siswa) -->
+                            <div class="flex justify-between items-center border-b pb-5">
+                                <div class="space-y-1">
+                                    <h2 class="text-xl font-extrabold text-blue-950 tracking-tight uppercase">Transkrip Nilai Akademik</h2>
+                                    <div class="text-xs grid grid-cols-2 gap-x-12 gap-y-1 pt-2">
+                                        <p><span class="font-semibold text-slate-500">Nama Siswa:</span> <span id="raport-student-name" class="font-bold text-slate-900">Nama Siswa</span></p>
+                                        <p><span class="font-semibold text-slate-500">Tanggal Terbit:</span> <span id="raport-realtime-date" class="font-bold text-slate-900">-</span></p>
+                                        <p><span class="font-semibold text-slate-500">Program:</span> <span class="font-bold text-slate-900">Pengembangan Diri Robotic</span></p>
+                                        <p><span class="font-semibold text-slate-500">Kelas:</span> <span id="raport-class-level" class="font-bold text-slate-900">3</span></p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-center p-2 bg-slate-50 rounded-2xl border border-slate-100">
+                                    <img src="asset/Tech-C Logo.png" alt="Tech-C Logo" class="h-12 object-contain" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'text-blue-950 font-black text-sm\'>TECH-C</div>';">
+                                </div>
+                            </div>
+
+                            <!-- Tabel Nilai Tugas Secara Penuh -->
+                            <div class="pt-2">
+                                <table class="w-full text-left border-collapse border border-slate-300 text-xs">
+                                    <thead>
+                                        <tr class="bg-blue-900 text-white font-semibold text-center">
+                                            <th class="border border-slate-300 py-3 px-3 w-[8%]">NO</th>
+                                            <th class="border border-slate-300 py-3 px-4 w-[37%]">Kompetensi / Tugas Praktikum</th>
+                                            <th class="border border-slate-300 py-3 px-3 w-[15%]">Nilai</th>
+                                            <th class="border border-slate-300 py-3 px-4 w-[40%]">Keterangan Capaian</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="raport-dynamic-tbody" class="divide-y divide-slate-300 text-slate-800">
+                                        <tr><td colspan="4" class="py-6 text-center text-slate-500">Memuat transkrip nilai tugas...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Footer Transkrip & Tanda Tangan Trainer -->
+                        <div class="flex justify-between items-end pt-4 border-t border-slate-100">
+                            <!-- Keterangan Penilaian -->
+                            <div class="w-60 text-[10px] text-slate-500 space-y-1">
+                                <p class="font-bold text-slate-700">Keterangan Skala Nilai:</p>
+                                <p>• 86 - 100 : A (Sangat Baik / Tuntas)</p>
+                                <p>• 76 - 85  : B (Baik / Tuntas)</p>
+                                <p>• &lt; 75    : C (Cukup / Perlu Peningkatan)</p>
+                            </div>
+
+                            <!-- Tanda Tangan Trainer Otomatis -->
+                            <div class="text-center space-y-4">
+                                <p id="raport-realtime-location-date" class="text-xs font-semibold text-slate-700">Cilegon, 7 Mei 2026<br>Trainer Pengampu</p>
+                                <div class="h-8"></div>
+                                <div class="border-t border-slate-400 w-48 pt-1">
+                                    <p id="raport-trainer-name" class="text-[11px] font-extrabold text-slate-800">Nama Trainer</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="p-4 border-t border-slate-800 bg-slate-950/80 flex justify-end gap-3">
+                <button onclick="closeCertificateModal()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition">Tutup</button>
+                <button onclick="downloadSingleFilePDF()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-6 py-2.5 rounded-xl transition shadow flex items-center gap-2">
+                    <i class="fa-solid fa-download"></i> Download Sertifikat & Transkrip (2 Halaman A4)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SUBMISSION TUGAS -->
+    <div id="submit-task-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full flex flex-col shadow-2xl overflow-hidden p-6 space-y-5">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-upload mr-2 text-indigo-400"></i> Kumpulkan Tugas</h3>
+                <button onclick="closeSubmitModal()" class="text-slate-400 hover:text-white text-xs"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <input type="hidden" id="modal-submit-task-id">
+            
+            <div id="submission-input-container"></div>
+
+            <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Catatan Tambahan (Opsional)</label>
+                <textarea id="modal-submission-notes" rows="3" placeholder="Tuliskan catatan..." class="w-full px-4 py-3 text-sm text-white placeholder-slate-500 bg-slate-950/60 border border-slate-800 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeSubmitModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold py-3 rounded-xl transition">Batal</button>
+                <button onclick="handleSendSubmission()" id="submit-action-btn" class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-3 rounded-xl transition shadow-lg shadow-indigo-600/25">Kirim Tugas</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT UTAMA -->
+    <script>
+        const SUPABASE_URL = 'https://rwuaqlwpieuiqwfotkkz.supabase.co';
+        const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ow_W7UPe5i6XkS0phs4btw_3ff3abUt';
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+        let studentId = '';
+        let studentName = '';
+        let studentClass = '';
+        let certificateAccess = false;
+        let isApproved = false;
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const { data: { session } } = await db.auth.getSession();
+            if (!session) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const { data: profile } = await db
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .maybeSingle();
+
+            if (profile) {
+                studentId = profile.id;
+                studentName = profile.name;
+                studentClass = profile.target_class || 'junior-a';
+                certificateAccess = profile.certificate_access === true;
+                isApproved = (profile.status_approval === 'approved');
+
+                document.getElementById('sidebar-name').textContent = profile.name;
+                
+                const initials = profile.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                document.getElementById('sidebar-initials').textContent = initials;
+
+                const taskSubDesc = document.getElementById('task-subtitle-desc');
+                if (taskSubDesc) {
+                    if (studentClass === 'junior-a' || studentClass === 'junior') {
+                        taskSubDesc.textContent = "Upload berkas hasil pengerjaan tugas praktikum Anda.";
+                    } else {
+                        taskSubDesc.textContent = "Kirimkan tautan hasil pengerjaan tugas Anda sebelum tenggat waktu.";
+                    }
+                }
+
+                if (isApproved) {
+                    document.getElementById('pending-approval-banner').classList.add('hidden');
+                    document.getElementById('main-dashboard-content').classList.remove('hidden');
+
+                    document.getElementById('welcome-student-name').textContent = profile.name;
+                    const classNameUpper = studentClass.toUpperCase();
+                    document.getElementById('header-student-class').textContent = `Kelas: ${classNameUpper}`;
+                    document.getElementById('sidebar-class-label').textContent = `Kelas ${classNameUpper}`;
+
+                    switchTab('materi');
+                    loadStudentMaterials();
+                    loadStudentTasks();
+                    loadStudentAttendance();
+                    loadStudentCertificateInfo();
+                } else {
+                    document.getElementById('pending-student-name').textContent = profile.name;
+                    document.getElementById('pending-approval-banner').classList.remove('hidden');
+                    document.getElementById('main-dashboard-content').classList.add('hidden');
+                    document.getElementById('sidebar-class-label').textContent = 'Menunggu Acc';
+                }
+            }
+        });
+
+        async function loadStudentMaterials() {
+            const gridContainer = document.getElementById('student-materials-grid');
+            if (!gridContainer || !isApproved) return;
+
+            const { data: materials, error } = await db
+                .from('materials')
+                .select('*')
+                .eq('target_class', studentClass)
+                .order('publish_date', { ascending: true, nullsFirst: false });
+
+            if (error) {
+                gridContainer.innerHTML = `<div class="bg-slate-900/60 border border-red-500/30 rounded-3xl p-6 text-center text-red-400 text-xs col-span-full">Gagal memuat materi: ${error.message}</div>`;
+                return;
+            }
+
+            if (!materials || materials.length === 0) {
+                gridContainer.innerHTML = `<div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 text-center text-slate-400 text-xs col-span-full">Belum ada materi pembelajaran untuk kelas Anda.</div>`;
+                return;
+            }
+
+            const nowTimestamp = new Date().getTime();
+
+            gridContainer.innerHTML = '';
+            materials.forEach(mat => {
+                let isUnlocked = true;
+                let publishText = "Tersedia";
+
+                if (mat.publish_date) {
+                    const pubDateObj = new Date(mat.publish_date);
+                    publishText = pubDateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    
+                    if (nowTimestamp < pubDateObj.getTime()) {
+                        isUnlocked = false;
+                    }
+                }
+
+                let cardStyle = isUnlocked ? "hover:border-blue-500/50" : "opacity-75 border-slate-800/40";
+                let badgeHtml = isUnlocked 
+                    ? `<span class="text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-0.5 rounded-md">Modul Belajar</span>`
+                    : `<span class="text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-md"><i class="fa-solid fa-lock mr-1"></i> Terkunci</span>`;
+
+                const safeTitle = mat.title.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+
+                let actionBtnHtml = isUnlocked
+                    ? `<button onclick="openMaterialViewer('${mat.description}', '${safeTitle}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"><i class="fa-solid fa-book-open"></i> Buka Materi</button>`
+                    : `<button disabled class="w-full bg-slate-800/50 text-slate-500 text-xs font-semibold py-2.5 px-4 rounded-xl border border-slate-800 cursor-not-allowed flex items-center justify-center gap-2"><i class="fa-solid fa-lock"></i> Belum Terbuka</button>`;
+
+                gridContainer.innerHTML += `
+                    <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 flex flex-col justify-between space-y-4 shadow-xl transition ${cardStyle}">
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-start">
+                                ${badgeHtml}
+                            </div>
+                            <h4 class="text-sm font-bold text-white line-clamp-2">${mat.title}</h4>
+                            <div class="pt-1 flex items-center gap-1.5 text-[11px] text-slate-400">
+                                <i class="fa-regular fa-calendar"></i> Rilis: ${publishText}
+                            </div>
+                        </div>
+                        <div class="pt-3 border-t border-slate-800/60">
+                            ${actionBtnHtml}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function openMaterialViewer(pdfUrl, title) {
+            document.getElementById('viewer-modal-title').innerHTML = `<i class="fa-solid fa-file-pdf text-blue-400"></i> ${title.replace(/&apos;/g, "'").replace(/&quot;/g, '"')}`;
+            const securePdfUrl = pdfUrl.includes('#') ? pdfUrl : pdfUrl + '#toolbar=0&navpanes=0&scrollbar=0';
+            document.getElementById('pdf-viewer-iframe').src = securePdfUrl;
+            document.getElementById('material-viewer-modal').classList.remove('hidden');
+        }
+
+        function closeMaterialViewerModal() {
+            document.getElementById('material-viewer-modal').classList.add('hidden');
+            document.getElementById('pdf-viewer-iframe').src = '';
+        }
+
+        async function loadStudentTasks() {
+            const gridContainer = document.getElementById('student-tasks-grid');
+            if (!gridContainer || !isApproved) return;
+
+            const { data: tasks, error } = await db
+                .from('tasks')
+                .select('*')
+                .eq('target_class', studentClass)
+                .order('created_at', { ascending: true });
+
+            if (error) {
+                gridContainer.innerHTML = `<div class="bg-slate-900/60 border border-red-500/30 rounded-3xl p-6 text-center text-red-400 text-xs col-span-full">Gagal memuat tugas: ${error.message}</div>`;
+                return;
+            }
+
+            const { data: submissions } = await db
+                .from('task_submissions')
+                .select('*')
+                .eq('student_id', studentId);
+
+            const submissionMap = {};
+            if (submissions) {
+                submissions.forEach(sub => {
+                    submissionMap[sub.task_id] = sub;
+                });
+            }
+
+            if (!tasks || tasks.length === 0) {
+                gridContainer.innerHTML = `<div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 text-center text-slate-400 text-xs col-span-full">Belum ada tugas untuk kelas Anda.</div>`;
+                return;
+            }
+
+            const nowTimestamp = new Date().getTime();
+
+            gridContainer.innerHTML = '';
+            tasks.forEach(t => {
+                let deadlineText = "Tanpa Batas Waktu";
+                let isDeadlinePassed = false;
+
+                if (t.deadline) {
+                    const deadlineObj = new Date(t.deadline);
+                    deadlineText = deadlineObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    
+                    if (nowTimestamp > deadlineObj.getTime()) {
+                        isDeadlinePassed = true;
+                    }
+                }
+
+                const mySub = submissionMap[t.id];
+                let statusBadge = `<span class="text-[10px] font-bold uppercase bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-md">Belum Dikumpul</span>`;
+                let actionBtn = ``;
+
+                if (mySub) {
+                    statusBadge = `<span class="text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-md">Sudah Dikumpul</span>`;
+                }
+
+                let gradeInfo = '';
+                if (mySub && mySub.grade !== null && mySub.grade !== undefined) {
+                    const letter = calculateGradeLetter(mySub.grade);
+                    gradeInfo = `<div class="mt-2 p-2.5 bg-purple-950/30 border border-purple-500/30 rounded-xl text-xs space-y-1"><p class="font-bold text-purple-300">Nilai: ${mySub.grade} (${letter})</p>${mySub.feedback ? `<p class="text-slate-300 italic">Feedback: "${mySub.feedback}"</p>` : ''}</div>`;
+                }
+
+                const safeNotes = mySub && mySub.notes ? mySub.notes.replace(/'/g, "&apos;").replace(/"/g, "&quot;") : '';
+
+                if (mySub) {
+                    actionBtn = `<div class="space-y-2"><div class="flex gap-2"><a href="${mySub.submission_link}" target="_blank" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold py-2 px-3 rounded-xl text-center transition truncate"><i class="fa-solid fa-file-arrow-down mr-1"></i> Lihat File/Link</a><button onclick="openSubmitModal('${t.id}', '${mySub.submission_link}', '${safeNotes}')" class="bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white text-xs font-semibold py-2 px-3 rounded-xl transition border border-blue-500/30">Edit</button></div>${gradeInfo}</div>`;
+                } else {
+                    if (isDeadlinePassed) {
+                        actionBtn = `<button disabled class="w-full bg-slate-800/50 text-slate-500 text-xs font-semibold py-2.5 px-4 rounded-xl border border-slate-800 cursor-not-allowed flex items-center justify-center gap-2"><i class="fa-solid fa-clock-rotate-left"></i> Tenggat Telah Lewat</button>`;
+                    } else {
+                        actionBtn = `<button onclick="openSubmitModal('${t.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-2.5 px-4 rounded-xl transition shadow flex items-center justify-center gap-2"><i class="fa-solid fa-upload"></i> Kumpulkan Tugas</button>`;
+                    }
+                }
+
+                gridContainer.innerHTML += `
+                    <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 flex flex-col justify-between space-y-4 shadow-xl">
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-start">
+                                <span class="text-[10px] font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2.5 py-0.5 rounded-md">Tugas</span>
+                                ${statusBadge}
+                            </div>
+                            <h4 class="text-sm font-bold text-white line-clamp-1">${t.title}</h4>
+                            <p class="text-xs text-slate-400 line-clamp-2">${t.description}</p>
+                            <div class="pt-1 flex items-center gap-1.5 text-[11px] ${isDeadlinePassed ? 'text-red-400 font-semibold' : 'text-amber-400 font-medium'}">
+                                <i class="fa-regular fa-clock"></i> Tenggat: ${deadlineText} ${isDeadlinePassed ? '(Berakhir)' : ''}
+                            </div>
+                        </div>
+                        <div class="pt-3 border-t border-slate-800/60">
+                            ${actionBtn}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function calculateGradeLetter(score) {
+            if (score === null || score === undefined || isNaN(score)) return '-';
+            if (score >= 85) return 'A';
+            if (score >= 70) return 'B';
+            if (score >= 55) return 'C';
+            if (score >= 40) return 'D';
+            return 'E';
+        }
+
+        function openSubmitModal(taskId, existingLink = '', existingNotes = '') {
+            document.getElementById('modal-submit-task-id').value = taskId;
+            document.getElementById('modal-submission-notes').value = existingNotes.replace(/&apos;/g, "'").replace(/&quot;/g, '"');
+
+            const container = document.getElementById('submission-input-container');
+
+            if (studentClass === 'junior-a' || studentClass === 'junior') {
+                container.innerHTML = `
+                    <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Upload Berkas File Tugas</label>
+                    <input type="file" id="modal-submission-file" class="w-full px-4 py-3 text-xs text-slate-300 bg-slate-950/60 border border-slate-800 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
+                    <p class="text-[10px] text-slate-500 mt-1">${existingLink ? 'Catatan: Anda sudah pernah mengupload file. Pilih file baru jika ingin menggantinya.' : 'Pilih file tugas dari perangkat Anda.'}</p>
+                `;
+            } else {
+                container.innerHTML = `
+                    <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Tautan Tugas (Google Drive / GitHub / URL)</label>
+                    <input type="url" id="modal-submission-link" value="${existingLink}" placeholder="https://..." class="w-full px-4 py-3 text-sm text-white placeholder-slate-500 bg-slate-950/60 border border-slate-800 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                `;
+            }
+
+            document.getElementById('submit-task-modal').classList.remove('hidden');
+        }
+
+        function closeSubmitModal() {
+            document.getElementById('submit-task-modal').classList.add('hidden');
+        }
+
+        async function handleSendSubmission() {
+            const taskId = document.getElementById('modal-submit-task-id').value;
+            const notes = document.getElementById('modal-submission-notes').value.trim();
+            const btn = document.getElementById('submit-action-btn');
+
+            let submissionValue = '';
+
+            if (studentClass === 'junior-a' || studentClass === 'junior') {
+                const fileInput = document.getElementById('modal-submission-file');
+                if (!fileInput || fileInput.files.length === 0) {
+                    const { data: currentSub } = await db.from('task_submissions').select('submission_link').eq('task_id', taskId).eq('student_id', studentId).maybeSingle();
+                    if (currentSub && currentSub.submission_link) {
+                        submissionValue = currentSub.submission_link;
+                    } else {
+                        alert('Silakan pilih file tugas yang ingin di-upload!');
+                        return;
+                    }
+                } else {
+                    const file = fileInput.files[0];
+                    btn.disabled = true;
+                    btn.innerText = 'Mengunggah file...';
+
+                    try {
+                        const fileExt = file.name.split('.').pop();
+                        const fileName = `task_${studentId}_${Date.now()}.${fileExt}`;
+
+                        const { error: uploadError } = await db.storage.from('materials').upload(fileName, file);
+                        if (uploadError) throw uploadError;
+
+                        const { data: { publicUrl } } = db.storage.from('materials').getPublicUrl(fileName);
+                        submissionValue = publicUrl;
+                    } catch (error) {
+                        alert('Gagal mengunggah file: ' + error.message);
+                        btn.disabled = false;
+                        btn.innerText = 'Kirim Tugas';
+                        return;
+                    }
+                }
+            } else {
+                const linkInput = document.getElementById('modal-submission-link');
+                submissionValue = linkInput ? linkInput.value.trim() : '';
+                if (!submissionValue) {
+                    alert('Tautan tugas wajib diisi!');
+                    return;
+                }
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'Mengirim...';
+
+            try {
+                const { data: existing } = await db
+                    .from('task_submissions')
+                    .select('id')
+                    .eq('task_id', taskId)
+                    .eq('student_id', studentId)
+                    .maybeSingle();
+
+                if (existing) {
+                    const { error } = await db
+                        .from('task_submissions')
+                        .update({ submission_link: submissionValue, notes: notes, status: 'Dikumpulkan', submitted_at: new Date().toISOString() })
+                        .eq('id', existing.id);
+
+                    if (error) throw error;
+                } else {
+                    const { error } = await db
+                        .from('task_submissions')
+                        .insert([{ task_id: taskId, student_id: studentId, submission_link: submissionValue, notes: notes, status: 'Dikumpulkan' }]);
+
+                    if (error) throw error;
+                }
+
+                alert('Tugas berhasil dikumpulkan!');
+                closeSubmitModal();
+                loadStudentTasks();
+            } catch (error) {
+                alert('Gagal mengumpulkan tugas: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Kirim Tugas';
+            }
+        }
+
+        async function loadStudentAttendance() {
+            const tbody = document.getElementById('student-attendance-tbody');
+            if (!tbody || !isApproved) return;
+
+            const { data: attendanceList, error } = await db
+                .from('attendance')
+                .select('*')
+                .eq('student_id', studentId)
+                .order('date', { ascending: false });
+
+            if (error || !attendanceList || attendanceList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-slate-400">Belum ada catatan absensi.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            attendanceList.forEach(att => {
+                const rawDate = att.date;
+                const dObj = new Date(rawDate + 'T00:00:00');
+                const dayName = dObj.toLocaleDateString('id-ID', { weekday: 'long' });
+                const formattedDate = dObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+                let statusBadge = '';
+                if (att.status === 'Hadir') {
+                    statusBadge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-lg font-semibold">Hadir</span>`;
+                } else if (att.status === 'Izin') {
+                    statusBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1 rounded-lg font-semibold">Izin</span>`;
+                } else {
+                    statusBadge = `<span class="bg-red-500/10 text-red-400 border border-red-500/20 px-3 py-1 rounded-lg font-semibold">Alpha</span>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-800/30 transition">
+                        <td class="py-3 px-4 font-bold text-white">${formattedDate}</td>
+                        <td class="py-3 px-4 text-slate-300">${dayName}</td>
+                        <td class="py-3 px-4 text-center">${statusBadge}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function loadStudentCertificateInfo() {
+            const statusText = document.getElementById('certificate-status-text');
+            const actionArea = document.getElementById('certificate-action-area');
+            if (!statusText || !actionArea || !isApproved) return;
+
+            if (certificateAccess) {
+                statusText.textContent = "Selamat! Anda telah dinyatakan lulus dan akses sertifikat telah dibuka oleh pengajar.";
+                actionArea.innerHTML = `
+                    <button onclick="openCertificateModal()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-6 py-3 rounded-xl shadow-lg shadow-amber-600/30 transition inline-flex items-center gap-2">
+                        <i class="fa-solid fa-award text-sm"></i> Lihat & Download Dokumen Kelulusan
+                    </button>
+                `;
+            } else {
+                statusText.textContent = "Sertifikat belum tersedia. Akses akan dibuka oleh pengajar setelah Anda menyelesaikan seluruh materi dan tugas.";
+                actionArea.innerHTML = `
+                    <button disabled class="bg-slate-800 text-slate-500 text-xs font-semibold px-6 py-3 rounded-xl cursor-not-allowed inline-flex items-center gap-2">
+                        <i class="fa-solid fa-lock text-sm"></i> Belum Terbuka
+                    </button>
+                `;
+            }
+        }
+
+        async function openCertificateModal() {
+            document.getElementById('cert-student-name').textContent = studentName;
+            document.getElementById('raport-student-name').textContent = studentName;
+            document.getElementById('raport-class-level').textContent = studentClass === 'senior' ? '12' : (studentClass === 'junior' ? '6' : '3');
+
+            // Set Tanggal Realtime saat ini
+            const now = new Date();
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            const formattedCurrentDate = now.toLocaleDateString('id-ID', options);
+            
+            document.getElementById('cert-realtime-date').textContent = `Cilegon, ${formattedCurrentDate}`;
+            document.getElementById('raport-realtime-date').textContent = formattedCurrentDate;
+            document.getElementById('raport-realtime-location-date').innerHTML = `Cilegon, ${formattedCurrentDate}<br>Trainer Pengampu`;
+
+            // Ambil Nama Trainer secara dinamis berdasarkan kelas yang diampu guru di database
+            let trainerDisplayName = "Mentor Pengampu";
+            try {
+                const { data: teacherProfile } = await db
+                    .from('profiles')
+                    .select('name')
+                    .eq('role', 'teacher')
+                    .eq('target_class', studentClass)
+                    .maybeSingle();
+
+                if (teacherProfile && teacherProfile.name) {
+                    trainerDisplayName = teacherProfile.name;
+                } else {
+                    const { data: anyTeacher } = await db
+                        .from('profiles')
+                        .select('name')
+                        .eq('role', 'teacher')
+                        .limit(1)
+                        .maybeSingle();
+                    if (anyTeacher && anyTeacher.name) {
+                        trainerDisplayName = anyTeacher.name;
+                    }
+                }
+            } catch (err) {
+                console.error("Gagal mengambil nama trainer:", err);
+            }
+
+            document.getElementById('cert-trainer-name').textContent = trainerDisplayName;
+            document.getElementById('raport-trainer-name').textContent = trainerDisplayName;
+
+            // Memuat transkrip nilai secara dinamis dari tabel tugas dan submission siswa
+            const raportTbody = document.getElementById('raport-dynamic-tbody');
+            raportTbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-500">Memuat data nilai tugas...</td></tr>`;
+
+            const { data: tasks } = await db.from('tasks').select('*').eq('target_class', studentClass).order('created_at', { ascending: true });
+            const { data: submissions } = await db.from('task_submissions').select('*').eq('student_id', studentId);
+
+            const subMap = {};
+            if (submissions) {
+                submissions.forEach(s => { subMap[s.task_id] = s; });
+            }
+
+            if (!tasks || tasks.length === 0) {
+                raportTbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-500">Belum ada tugas atau transkrip untuk kelas ini.</td></tr>`;
+            } else {
+                raportTbody.innerHTML = '';
+                tasks.forEach((t, idx) => {
+                    const sub = subMap[t.id];
+                    const gradeVal = (sub && sub.grade !== null && sub.grade !== undefined) ? sub.grade : '-';
+                    let letterGrade = '-';
+                    if (sub && sub.grade !== null && sub.grade !== undefined) {
+                        const score = Number(sub.grade);
+                        if (score >= 85) letterGrade = 'A (Sangat Baik)';
+                        else if (score >= 76) letterGrade = 'B (Baik)';
+                        else letterGrade = 'C (Cukup)';
+                    }
+                    const statusKet = (sub && sub.grade !== null && sub.grade !== undefined) ? `Tuntas (${letterGrade})` : (sub ? 'Menunggu Penilaian' : 'Belum Dikerjakan');
+
+                    raportTbody.innerHTML += `
+                        <tr>
+                            <td class="border border-slate-300 py-3 px-3 text-center font-medium">${idx + 1}</td>
+                            <td class="border border-slate-300 py-3 px-4 font-semibold">${t.title}</td>
+                            <td class="border border-slate-300 py-3 px-3 text-center font-bold text-blue-900">${gradeVal}</td>
+                            <td class="border border-slate-300 py-3 px-4 text-slate-600">${statusKet}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            document.getElementById('certificate-modal').classList.remove('hidden');
+        }
+
+        function closeCertificateModal() {
+            document.getElementById('certificate-modal').classList.add('hidden');
+        }
+
+        // Fungsi Download Presisi Ukuran A4 Landscape (297x210 mm)
+        function downloadSingleFilePDF() {
+            const packageElement = document.getElementById('printable-package');
+            if (!packageElement) {
+                alert('Elemen dokumen tidak ditemukan!');
+                return;
+            }
+
+            const opt = {
+                margin:        0,
+                filename:      `Sertifikat_Dan_Transkrip_${studentName.replace(/\s+/g, '_')}.pdf`,
+                image:         { type: 'jpeg', quality: 0.98 },
+                html2canvas:   { scale: 2, useCORS: true, letterRendering: true, logging: false },
+                jsPDF:         { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+
+            const btn = event.currentTarget;
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Memproses PDF A4...`;
+
+            html2pdf().from(packageElement).set(opt).save().then(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }).catch(err => {
+                console.error("Error generating PDF:", err);
+                alert('Gagal mendownload PDF. Pastikan browser Anda mengizinkan unduhan pop-up.');
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            });
+        }
+
+        function toggleSidebarCollapse() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleIcon = document.getElementById('toggle-icon');
+            sidebar.classList.toggle('collapsed');
+            toggleIcon.style.transform = sidebar.classList.contains('collapsed') ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+
+        function switchTab(tab) {
+            if (!isApproved) return;
+
+            const tabs = ['materi', 'tugas', 'absensi', 'sertifikat'];
+            
+            tabs.forEach(t => {
+                const sec = document.getElementById(`section-${t}`);
+                const nav = document.getElementById(`nav-${t}`);
+                if (sec) sec.classList.add('hidden');
+                if (nav) nav.className = "flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 transition-all duration-200";
+            });
+
+            if (document.getElementById(`section-${tab}`)) {
+                document.getElementById(`section-${tab}`).classList.remove('hidden');
+            }
+            if (document.getElementById(`nav-${tab}`)) {
+                document.getElementById(`nav-${tab}`).className = "flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-xs font-semibold bg-blue-600 text-white shadow-xl shadow-blue-600/25 transition-all duration-200";
+            }
+        }
+
+        async function handleLogout() {
+            await db.auth.signOut();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
