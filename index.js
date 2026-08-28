@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 
-app.use("/assets", express.static(path.join(__dirname, "assets")));
+app.use("/asset", express.static(path.join(__dirname, "asset")));
 
 
 app.get("/admin", (req, res) => {
