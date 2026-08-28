@@ -13,6 +13,14 @@ app.use(express.static(path.join(__dirname)));
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "index.html"));
 });
+
+// Serve folder images
+app.use("/images", express.static(path.join(__dirname, "images")));
+
+
+app.use("/assets", express.static(path.join(__dirname, "assets")));
+
+
 app.get("/admin", (req, res) => {
     res.sendFile(path.join(__dirname, "admin-dashboard.html"));
 });
