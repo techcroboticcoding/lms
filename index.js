@@ -11,7 +11,7 @@ app.use(express.static(path.join(__dirname)));
 
 // Route utama
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+    res.sendFile(path.join(__dirname, "index.html"));
 });
 
 // Jalankan server
