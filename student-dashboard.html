@@ -37,22 +37,79 @@
         .page-break {
             page-break-after: always;
             break-after: page;
-        }
-        .certificate-sheet {
-            width: 1123px;
-            min-width: 1123px;
-            max-width: 1123px;
-            height: 794px;
-            min-height: 794px;
-            max-height: 794px;
-            background: #ffffff;
-            color: #0f172a;
-            position: relative;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-            border: 8px solid #1e3a8a;
-        }
+        }/* PENGATURAN SERTIFIKAT BACKGROUND JPG (A4 LANDSCAPE: 1123px x 794px) */
+.certificate-sheet {
+    width: 1123px;
+    min-width: 1123px;
+    max-width: 1123px;
+    height: 794px;
+    min-height: 794px;
+    max-height: 794px;
+    position: relative;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    
+    /* SETTING GAMBAR BACKGROUND */
+    background-image: url('images/sertifikat.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* KELAS KUSUS UNTUK MENATAP TEKS DI ATAS GAMBAR BACKGROUND */
+.cert-field {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    left: 0;
+}
+
+/* Contoh koordinat posisi teks (Sesuaikan angka 'top' dengan posisi di gambar JPG Anda) */
+.cert-no-pos {
+    top: 240px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.cert-name-pos {
+    top: 360px;
+    font-size: 38px;
+    font-weight: 900;
+    color: #0f172a;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.cert-predikat-pos {
+    top: 450px;
+    font-size: 18px;
+    font-weight: 800;
+    color: #1e3a8a;
+}
+
+.cert-date-pos {
+    top: 500px;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.cert-direktur-pos {
+    position: absolute;
+    bottom: 80px;
+    left: 180px; /* Koordinat X untuk TTD Direktur */
+    width: 250px;
+    text-align: center;
+}
+
+.cert-trainer-pos {
+    position: absolute;
+    bottom: 80px;
+    right: 180px; /* Koordinat X untuk TTD Trainer */
+    width: 250px;
+    text-align: center;
+}
         .raport-sheet {
             width: 1123px;
             min-width: 1123px;
@@ -264,17 +321,40 @@
                 <!-- KONTEN UTAMA PAKET DOKUMEN (1 FILE, 2 HALAMAN PAS) -->
                 <div id="printable-package" class="w-full space-y-8 flex flex-col items-center">
                     
-                    <!-- HALAMAN 1: SERTIFIKAT (UKURAN A4 LANDSCAPE) -->
-                    <div class="certificate-sheet p-12 flex flex-col justify-between text-slate-900 relative shadow-2xl rounded-2xl bg-white page-break">
-                        
-                        <!-- Header Logo -->
-                        <div class="flex justify-between items-center z-10">
-                            <div></div>
-                            <div class="flex items-center justify-center">
-                                <img src="asset/Tech-C Logo.png" alt="Tech-C Logo" class="h-12 object-contain" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'text-blue-950 font-black text-lg tracking-wider\'>TECH-C <span class=\'text-xs font-normal text-slate-600\'>Robotic & Coding</span></div>';">
-                            </div>
-                            <div></div>
-                        </div>
+                  <!-- HALAMAN 1: SERTIFIKAT (BACKGROUND GAMBAR JPG) -->
+<div class="certificate-sheet shadow-2xl rounded-2xl page-break">
+    
+    <!-- Nomor Sertifikat -->
+    <div class="cert-field cert-no-pos">
+        <p>NO : 141/TECH-C/RB-CD/CLG/V/2026</p>
+    </div>
+
+    <!-- Nama Siswa -->
+    <div class="cert-field cert-name-pos">
+        <h1 id="cert-student-name">NAMA SISWA</h1>
+    </div>
+
+    <!-- Predikat -->
+    <div class="cert-field cert-predikat-pos">
+        <span>Sangat Baik</span>
+    </div>
+
+    <!-- Tanggal Terbit -->
+    <div class="cert-field cert-date-pos">
+        <p id="cert-realtime-date">Cilegon, 12 Mei 2026</p>
+    </div>
+
+    <!-- Tanda Tangan Direktur (Jika teks nama direktur perlu ditimpa) -->
+    <div class="cert-direktur-pos">
+        <p class="text-[12px] font-extrabold text-blue-950">Rizki Rahayu Pratama</p>
+    </div>
+
+    <!-- Tanda Tangan Trainer -->
+    <div class="cert-trainer-pos">
+        <p id="cert-trainer-name" class="text-[12px] font-extrabold text-slate-800">Nama Trainer</p>
+    </div>
+
+</div>
 
                         <!-- Judul Sertifikat -->
                         <div class="text-center space-y-1 z-10">
@@ -934,7 +1014,7 @@
                 margin:        0,
                 filename:      `Sertifikat_Dan_Transkrip_${studentName.replace(/\s+/g, '_')}.pdf`,
                 image:         { type: 'jpeg', quality: 0.98 },
-                html2canvas:   { scale: 2, useCORS: true, letterRendering: true, logging: false },
+                html2canvas:   { scale: 3, useCORS: true, letterRendering: true, logging: false },
                 jsPDF:         { unit: 'mm', format: 'a4', orientation: 'landscape' }
             };
 
