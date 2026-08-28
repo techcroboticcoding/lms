@@ -1,0 +1,12 @@
+{
+  "name": "website-express",
+  "version": "1.0.0",
+  "description": "Website menggunakan Node.js Express",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
