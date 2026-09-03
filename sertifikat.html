@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate of Completion & Academic Transcript - TECH-C</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #050811; margin: 0; padding: 0; }
+        .font-certificate { font-family: 'Cinzel', serif; }
+
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
+        /* Penyesuaian agar di HP/Mobile ukurannya tetap proporsional */
+        @media screen and (max-width: 1024px) {
+            body {
+                background-color: #ffffff;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 10px;
+            }
+            .page-container {
+                transform: scale(0.65);
+                transform-origin: top center;
+                margin-bottom: -70mm !important;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            }
+        }
+
+        .page-container {
+            width: 297mm;
+            height: 198mm;
+            padding: 14mm 18mm;
+            margin: 0 auto 10mm auto;
+            background: #ffffff !important;
+            color: #1e293b;
+            position: relative;
+            box-sizing: border-box;
+            page-break-after: always;
+            break-after: page;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* Ornamen Garis Siku Sudut Klasik */
+        .corner-bracket {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            z-index: 15;
+            pointer-events: none;
+            border-color: #1d4ed8;
+            border-style: solid;
+        }
+        .cb-tl { top: 9mm; left: 9mm; border-width: 3px 0 0 3px; }
+        .cb-tr { top: 9mm; right: 9mm; border-width: 3px 3px 0 0; }
+        .cb-bl { bottom: 9mm; left: 9mm; border-width: 0 0 3px 3px; }
+        .cb-br { bottom: 9mm; right: 9mm; border-width: 0 3px 3px 0; }
+
+        /* Pola Sirkuit Geometris Oktagon (Menjalar Full 1 Halaman) */
+        .octagon-circuit-bg {
+            position: absolute;
+            inset: 0;
+            opacity: 0.13;
+            pointer-events: none;
+            z-index: 1;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='450' height='450' viewBox='0 0 450 450'%3E%3Cg fill='none' stroke='%232563eb' stroke-width='1.5'%3E%3Cpolygon points='225,75 325,125 375,225 325,325 225,375 125,325 75,225 125,125' stroke-dasharray='6 3'/%3E%3Cpolygon points='225,115 295,150 330,225 295,300 225,335 155,300 120,225 155,150'/%3E%3Cpath d='M225,75 L225,10 M325,125 L395,55 M375,225 L440,225 M325,325 L395,395 M225,375 L225,440 M125,325 L55,395 M75,225 L10,225 M125,125 L55,55'/%3E%3Cpath d='M225,115 L180,30 L90,30 M295,150 L360,90 L410,90 M330,225 L400,280 M295,300 L350,380 M225,335 L270,410 M155,300 L100,380 M120,225 L40,170 M155,150 L90,100'/%3E%3Ccircle cx='225' cy='75' r='4' fill='%232563eb'/%3E%3Ccircle cx='325' cy='125' r='4' fill='%232563eb'/%3E%3Ccircle cx='375' cy='225' r='4' fill='%232563eb'/%3E%3Ccircle cx='325' cy='325' r='4' fill='%232563eb'/%3E%3Ccircle cx='225' cy='375' r='4' fill='%232563eb'/%3E%3Ccircle cx='125' cy='325' r='4' fill='%232563eb'/%3E%3Ccircle cx='75' cy='225' r='4' fill='%232563eb'/%3E%3Ccircle cx='125' cy='125' r='4' fill='%232563eb'/%3E%3Ccircle cx='225' cy='225' r='6' fill='%232563eb'/%3E%3C/g%3E%3C/svg%3E");
+            background-repeat: repeat;
+        }
+
+        @media print {
+            body { background: transparent; }
+            .no-print { display: none !important; }
+            .page-container {
+                width: 297mm;
+                height: 198mm;
+                margin: 0;
+                transform: none !important;
+                box-shadow: none;
+                page-break-after: always;
+                break-after: page;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center py-4">
+
+    <!-- Tombol Aksi Atas (Tanpa Tombol Kembali, Bersih dari Error Routing) -->
+    <div class="max-w-[297mm] w-full flex justify-end items-center mb-4 px-4 no-print">
+        <div class="flex items-center gap-3">
+            <span class="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl">
+                <i class="fa-solid fa-circle-info mr-1"></i> Set Margins to <b>None</b> & check <b>Background graphics</b>
+            </span>
+            <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-5 py-2 rounded-xl shadow-lg shadow-blue-600/30 transition flex items-center gap-2">
+                <i class="fa-solid fa-print"></i> Print Document
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 1: CERTIFICATE OF APPRECIATION ================= -->
+    <div class="page-container border-8 border-slate-100 shadow-2xl relative">
+        <div class="octagon-circuit-bg"></div>
+
+        <div class="corner-bracket cb-tl"></div>
+        <div class="corner-bracket cb-tr"></div>
+        <div class="corner-bracket cb-bl"></div>
+        <div class="corner-bracket cb-br"></div>
+
+        <div class="absolute border-2 border-blue-700 pointer-events-none rounded-lg z-10" style="top: 7mm; bottom: 7mm; left: 7mm; right: 7mm;"></div>
+        <div class="absolute border border-blue-900/30 pointer-events-none rounded-md z-10" style="top: 8.5mm; bottom: 8.5mm; left: 8.5mm; right: 8.5mm;"></div>
+
+        <div class="text-center relative z-25 space-y-1 pt-2">
+            <div class="flex justify-center items-center gap-4">
+                <img src="asset/kslogo.png" alt="KS Logo" class="h-10 object-contain">
+                <img src="asset/Tech-C Logo.png" alt="Tech-C Logo" class="h-11 object-contain">
+            </div>
+            <div class="w-16 h-0.5 bg-blue-600 mx-auto my-1"></div>
+            <h1 class="text-3xl font-extrabold text-blue-950 font-certificate tracking-widest">CERTIFICATE OF COMPLETION</h1>
+            <p class="text-[11px] font-bold text-slate-500 tracking-[0.3em] uppercase"> • Coding & Robotics Class Batch 2 • </p>
+            <p class="text-xs font-semibold text-slate-600 pt-1">Certificate Number: <span class="font-mono font-bold text-blue-900" id="cert-code-label">157/.../CERT-CR.YPKS/TECH-C/X/2026</span></p>
+        </div>
+
+        <div class="text-center space-y-2.5 relative z-25 my-auto px-6">
+            <p class="text-xs text-slate-700 font-medium">This is proudly presented to:</p>
+            
+            <div class="py-1">
+                <h3 id="student-name" class="text-4xl font-extrabold text-blue-950 tracking-tight border-b-4 border-blue-600 pb-1.5 inline-block px-16 font-certificate">Loading Student Name...</h3>
+            </div>
+            
+            <p class="text-xs text-slate-700 max-w-2xl mx-auto leading-relaxed">
+                For successfully completing the <span class="font-bold text-blue-700">Coding & Robotic Class</span> (<span id="student-class" class="font-bold uppercase text-blue-700">...</span>)<br>
+                organized by <span class="font-bold text-blue-700">Krakatau Education Foundation</span> and <span class="font-bold text-blue-700">Tech-C Robotic And Coding</span><br>
+                held from <span class="font-bold text-blue-700">August 15 – October 24, 2026</span>.<br>
+                Achieved with the graduation predicate:
+            </p>
+
+            <div class="pt-0.5">
+                <span id="predikat-badge" class="text-base font-extrabold text-blue-900 font-certificate tracking-wider bg-blue-50 px-8 py-1.5 rounded-xl border-2 border-blue-300 inline-block shadow-md">Excellent</span>
+            </div>
+
+            <p class="text-xs font-semibold text-slate-600 pt-0.5">Cilegon, October 24, 2026</p>
+        </div>
+
+        <!-- Tanda Tangan -->
+        <div class="grid grid-cols-2 gap-16 pt-2 relative z-25 px-16 pb-2">
+            <div class="text-center space-y-0.5">
+                <p class="text-[10px] font-bold text-slate-700 uppercase tracking-wider leading-tight">Director of<br>Tech-C Robotic And Coding</p>
+                <div class="h-16 flex items-end justify-center pb-0.5">
+                    <img src="asset/ttdrizki.png" alt="Director Signature" class="h-16 object-contain mx-auto">
+                </div>
+                <div class="border-b border-blue-500 w-48 mx-auto"></div>
+                <p class="text-xs font-bold text-slate-900 pt-0.5">Rizki Rahayu Pratama</p>
+            </div>
+            <div class="text-center space-y-0.5">
+                <p class="text-[10px] font-bold text-slate-700 uppercase tracking-wider leading-tight">Chairman of the<br>Krakatau Education Foundation</p>
+                <div class="h-16 flex items-end justify-center pb-0.5">
+                   
+                </div>
+                <div class="border-b border-blue-500 w-48 mx-auto"></div>
+                <p class="text-xs font-bold text-slate-900 pt-0.5">Sulistyawati</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= PAGE 2: ACADEMIC TRANSCRIPT & TASK EVALUATION ================= -->
+    <div class="page-container border-8 border-slate-100 shadow-2xl relative">
+        <div class="octagon-circuit-bg"></div>
+
+        <div class="corner-bracket cb-tl"></div>
+        <div class="corner-bracket cb-tr"></div>
+        <div class="corner-bracket cb-bl"></div>
+        <div class="corner-bracket cb-br"></div>
+
+        <div class="absolute border-2 border-blue-700 pointer-events-none rounded-lg z-10" style="top: 7mm; bottom: 7mm; left: 7mm; right: 7mm;"></div>
+        <div class="absolute border border-blue-900/30 pointer-events-none rounded-md z-10" style="top: 8.5mm; bottom: 8.5mm; left: 8.5mm; right: 8.5mm;"></div>
+
+        <div class="flex justify-between items-center border-b-2 border-slate-200 pb-2 relative z-25 pt-1 px-3">
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2">
+                    <img src="asset/kslogo.png" alt="KS Logo" class="h-8 object-contain">
+                    <img src="asset/Tech-C Logo.png" alt="Tech-C Logo" class="h-9 object-contain">
+                </div>
+                <div>
+                    <h2 class="text-xs font-bold text-blue-950 tracking-wide font-certificate">ACADEMIC TRANSCRIPT & TASK EVALUATION</h2>
+                    <p class="text-[9px] font-semibold text-blue-700 uppercase tracking-wider">Official Academic Record — TECH-C Robotics & Coding</p>
+                </div>
+            </div>
+            <div class="text-right text-xs text-slate-700 space-y-0.5 bg-slate-50 border border-slate-200 px-3 py-1 rounded-lg shadow-sm">
+                <p>Name: <span id="trans-name" class="font-bold text-slate-900">-</span></p>
+                <p>Class: <span id="trans-class" class="font-bold uppercase text-blue-700">-</span></p>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto relative z-25 py-2 px-3 flex-1">
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="border-b-2 border-blue-600/30 text-[10px] font-bold text-blue-950 uppercase tracking-wider bg-blue-50/70">
+                        <th class="py-2.5 px-3 w-[6%] text-center">No</th>
+                        <th class="py-2.5 px-3 w-[36%]">Module Title / Practical Assignment</th>
+                        <th class="py-2.5 px-3 w-[12%] text-center">Numeric Score</th>
+                        <th class="py-2.5 px-3 w-[12%] text-center">Grade</th>
+                        <th class="py-2.5 px-3 w-[34%]">Instructor Feedback / Notes</th>
+                    </tr>
+                </thead>
+                <tbody id="transcripts-tbody" class="divide-y divide-slate-200">
+                    <tr><td colspan="5" class="py-6 text-center text-slate-500">Loading academic transcript...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Bagian Bawah Transkrip (Tanpa TTD Pengajar) -->
+        <div class="pt-2 flex flex-col relative z-25 text-xs px-3 pb-2 bg-slate-50/75 rounded-b-lg space-y-2">
+            <div class="flex justify-between items-center border-t border-slate-200 pt-2">
+                <div class="flex items-center gap-4">
+                    <p class="text-slate-700 text-[11px] font-medium">Final Average Score: <span id="avg-score" class="font-bold text-blue-700 text-xs">-</span></p>
+                    <span class="text-slate-300">|</span>
+                    <p class="text-slate-700 text-[11px] font-medium">Graduation Predicate: <span id="final-pred" class="font-bold text-blue-800 text-xs">-</span></p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[9px] font-semibold text-slate-500">Official Document Verified by TECH-C LMS System</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIKA DATABASE & PENOMORAN URUT ABJAD (DINAMIS DARI AKUN LOGIN / URL PARAMETER) -->
+    <script>
+        const SUPABASE_URL = 'https://rwuaqlwpieuiqwfotkkz.supabase.co';
+        const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ow_W7UPe5i6XkS0phs4btw_3ff3abUt';
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+        function calculateGradeLetter(score) {
+            if (score === null || score === undefined || isNaN(score)) return '-';
+            if (score >= 86) return 'Excellent';
+            if (score >= 76) return 'Good';
+            if (score >= 41) return 'Fair';
+            return 'Needs Improvement';
+        }
+
+        function calculateShortLetter(score) {
+            if (score === null || score === undefined || isNaN(score)) return '-';
+            if (score >= 86) return 'A';
+            if (score >= 76) return 'B';
+            if (score >= 41) return 'C';
+            return 'D';
+        }
+
+        function getAlphabetIndex(index) {
+            let result = '';
+            index += 1;
+            while (index > 0) {
+                let modulo = (index - 1) % 26;
+                result = String.fromCharCode(97 + modulo) + result;
+                index = Math.floor((index - modulo) / 26);
+            }
+            return result;
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            let studentId = urlParams.get('id');
+
+            // Jika dibuka langsung tanpa parameter ?id=..., cek session user yang sedang login saat ini
+            if (!studentId) {
+                const { data: { session } } = await db.auth.getSession();
+                if (session) {
+                    studentId = session.user.id;
+                } else {
+                    alert('Student ID or active session not found.');
+                    return;
+                }
+            }
+
+            // Mengambil Seluruh Profil Siswa untuk Urutan Abjad
+            const { data: allStudents } = await db.from('profiles').select('id, created_at').order('created_at', { ascending: true });
+            
+            let studentSubIndex = 'a';
+            if (allStudents) {
+                const foundIndex = allStudents.findIndex(s => s.id === studentId);
+                if (foundIndex !== -1) {
+                    studentSubIndex = getAlphabetIndex(foundIndex);
+                }
+            }
+
+            const { data: profile } = await db.from('profiles').select('*').eq('id', studentId).maybeSingle();
+            if (!profile) return;
+
+            document.getElementById('student-name').textContent = profile.name;
+            document.getElementById('student-class').textContent = profile.target_class ? profile.target_class.toUpperCase() : '-';
+            
+            // Format Nomor Sertifikat: 157.<abjad>/CERT-CR.YPKS/TECH-C/X/2026
+            const currentMonthRoman = "X"; 
+            const currentYear = "2026";
+            document.getElementById('cert-code-label').textContent = `157.${studentSubIndex}/CERT-CR.YPKS/TECH-C/${currentMonthRoman}/${currentYear}`;
+
+            document.getElementById('trans-name').textContent = profile.name;
+            document.getElementById('trans-class').textContent = profile.target_class ? profile.target_class.toUpperCase() : '-';
+
+            const { data: submissions } = await db.from('task_submissions').select(`*, tasks(title)`).eq('student_id', studentId);
+            const tbody = document.getElementById('transcripts-tbody');
+
+            if (!submissions || submissions.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500">No graded assignments yet.</td></tr>`;
+                document.getElementById('predikat-badge').textContent = 'Active Learner';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            let totalScore = 0, count = 0;
+
+            submissions.forEach((sub, i) => {
+                const title = sub.tasks ? sub.tasks.title : 'STREAM Practical';
+                const score = sub.grade ?? '-';
+                if (sub.grade !== null && !isNaN(sub.grade)) { totalScore += sub.grade; count++; }
+
+                tbody.innerHTML += `
+                    <tr class="align-middle">
+                        <td class="py-2 px-3 text-center text-slate-500 font-medium">${i + 1}</td>
+                        <td class="py-2 px-3 font-semibold text-slate-800">${title}</td>
+                        <td class="py-2 px-3 text-center font-bold text-blue-700">${score}</td>
+                        <td class="py-2 px-3 text-center"><span class="px-2.5 py-0.5 text-[9px] font-bold bg-blue-50 text-blue-700 border border-blue-200 rounded-md">${calculateShortLetter(sub.grade)}</span></td>
+                        <td class="py-2 px-3 text-slate-600 italic">${sub.feedback || 'Satisfactory note'}</td>
+                    </tr>
+                `;
+            });
+
+            if (count > 0) {
+                const avg = (totalScore / count).toFixed(1);
+                const finalPredikat = calculateGradeLetter(avg);
+                document.getElementById('avg-score').textContent = avg;
+                document.getElementById('final-pred').textContent = `${finalPredikat} (${calculateShortLetter(avg)})`;
+                document.getElementById('predikat-badge').textContent = finalPredikat;
+            }
+        });
+    </script>
+</body>
+</html>

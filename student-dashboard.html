@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Siswa - STREAM LMS</title>
+    <title>Dashboard Siswa - TECH-C LMS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -32,99 +32,6 @@
             padding-left: 1rem !important;
             padding-right: 1rem !important;
         }
-
-        /* PENGATURAN PRESISI UKURAN A4 LANDSCAPE (297mm x 210mm) */
-        .page-break {
-            page-break-after: always;
-            break-after: page;
-        }/* PENGATURAN SERTIFIKAT BACKGROUND JPG (A4 LANDSCAPE: 1123px x 794px) */
-.certificate-sheet {
-    width: 1123px;
-    min-width: 1123px;
-    max-width: 1123px;
-    height: 794px;
-    min-height: 794px;
-    max-height: 794px;
-    position: relative;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    overflow: hidden;
-    
-    /* SETTING GAMBAR BACKGROUND */
-    background-image: url('./images/sertifikat.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-/* KELAS KUSUS UNTUK MENATAP TEKS DI ATAS GAMBAR BACKGROUND */
-.cert-field {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    left: 0;
-}
-
-/* Contoh koordinat posisi teks (Sesuaikan angka 'top' dengan posisi di gambar JPG Anda) */
-.cert-no-pos {
-    top: 240px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #475569;
-}
-
-.cert-name-pos {
-    top: 360px;
-    font-size: 38px;
-    font-weight: 900;
-    color: #0f172a;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-.cert-predikat-pos {
-    top: 450px;
-    font-size: 18px;
-    font-weight: 800;
-    color: #1e3a8a;
-}
-
-.cert-date-pos {
-    top: 500px;
-    font-size: 13px;
-    color: #64748b;
-}
-
-.cert-direktur-pos {
-    position: absolute;
-    bottom: 80px;
-    left: 180px; /* Koordinat X untuk TTD Direktur */
-    width: 250px;
-    text-align: center;
-}
-
-.cert-trainer-pos {
-    position: absolute;
-    bottom: 80px;
-    right: 180px; /* Koordinat X untuk TTD Trainer */
-    width: 250px;
-    text-align: center;
-}
-        .raport-sheet {
-            width: 1123px;
-            min-width: 1123px;
-            max-width: 1123px;
-            height: 794px;
-            min-height: 794px;
-            max-height: 794px;
-            background: #ffffff;
-            color: #0f172a;
-            position: relative;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            border: 4px solid #cbd5e1;
-            overflow: hidden;
-        }
     </style>
 </head>
 <body class="tech-bg min-h-screen text-slate-200 selection:bg-blue-500 selection:text-white flex overflow-x-hidden font-sans">
@@ -138,7 +45,7 @@
                         <i class="fa-solid fa-graduation-cap text-lg"></i>
                     </div>
                     <div class="sidebar-text truncate">
-                        <h1 class="text-sm font-bold text-white tracking-wider">STREAM LMS</h1>
+                        <h1 class="text-sm font-bold text-white tracking-wider">TECH-C LMS</h1>
                         <p class="text-[11px] text-slate-400 font-medium">Portal Siswa</p>
                     </div>
                 </div>
@@ -304,29 +211,23 @@
         </div>
     </div>
 
-    <!-- MODAL PREVIEW SERTIFIKAT & RAPORT (1 FILE PDF, 2 HALAMAN PAS A4) -->
-    <div id="certificate-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-5xl w-full flex flex-col shadow-2xl overflow-hidden my-auto max-h-[95vh]">
-            <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/80">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-award text-amber-400"></i> Pratinjau Dokumen Kelulusan & Transkrip (A4)
+    <!-- MODAL DETAIL INSTRUKSI TUGAS -->
+    <div id="task-detail-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full flex flex-col shadow-2xl overflow-hidden p-6 space-y-5">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 id="detail-modal-title" class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info text-blue-400"></i> Detail Tugas
                 </h3>
-                <button onclick="closeCertificateModal()" class="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition">
+                <button onclick="closeTaskDetailModal()" class="text-slate-400 hover:text-white text-xs p-1.5 rounded-lg hover:bg-slate-800 transition">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            
-            <div class="p-6 overflow-y-auto flex-1 space-y-8 bg-slate-950/40 flex flex-col items-center">
-                
-                </div>
-
+            <div class="space-y-2">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">Instruksi Lengkap Tugas:</label>
+                <div id="detail-modal-desc" class="text-xs text-slate-200 bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4 max-h-60 overflow-y-auto leading-relaxed whitespace-pre-wrap"></div>
             </div>
-
-            <div class="p-4 border-t border-slate-800 bg-slate-950/80 flex justify-end gap-3">
-                <button onclick="closeCertificateModal()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition">Tutup</button>
-                <button onclick="downloadSingleFilePDF()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-6 py-2.5 rounded-xl transition shadow flex items-center gap-2">
-                    <i class="fa-solid fa-download"></i> Download Sertifikat & Transkrip (2 Halaman A4)
-                </button>
+            <div class="pt-2 flex justify-end">
+                <button onclick="closeTaskDetailModal()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition">Tutup</button>
             </div>
         </div>
     </div>
@@ -368,7 +269,7 @@
         document.addEventListener("DOMContentLoaded", async () => {
             const { data: { session } } = await db.auth.getSession();
             if (!session) {
-                window.location.href = '/';
+                window.location.href = 'index.html';
                 return;
             }
 
@@ -563,6 +464,8 @@
                 }
 
                 const safeNotes = mySub && mySub.notes ? mySub.notes.replace(/'/g, "&apos;").replace(/"/g, "&quot;") : '';
+                const safeDescription = t.description ? t.description.replace(/'/g, "&apos;").replace(/"/g, "&quot;") : 'Tidak ada deskripsi.';
+                const safeTitle = t.title.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
 
                 if (mySub) {
                     actionBtn = `<div class="space-y-2"><div class="flex gap-2"><a href="${mySub.submission_link}" target="_blank" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold py-2 px-3 rounded-xl text-center transition truncate"><i class="fa-solid fa-file-arrow-down mr-1"></i> Lihat File/Link</a><button onclick="openSubmitModal('${t.id}', '${mySub.submission_link}', '${safeNotes}')" class="bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white text-xs font-semibold py-2 px-3 rounded-xl transition border border-blue-500/30">Edit</button></div>${gradeInfo}</div>`;
@@ -581,9 +484,12 @@
                                 <span class="text-[10px] font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2.5 py-0.5 rounded-md">Tugas</span>
                                 ${statusBadge}
                             </div>
-                            <h4 class="text-sm font-bold text-white line-clamp-1">${t.title}</h4>
+                            <h4 class="text-sm font-bold text-white leading-snug">${t.title}</h4>
                             <p class="text-xs text-slate-400 line-clamp-2">${t.description}</p>
-                            <div class="pt-1 flex items-center gap-1.5 text-[11px] ${isDeadlinePassed ? 'text-red-400 font-semibold' : 'text-amber-400 font-medium'}">
+                            <button onclick="openTaskDetailModal('${safeTitle}', '${safeDescription}')" class="text-[11px] font-semibold text-blue-400 hover:text-blue-300 transition flex items-center gap-1 pt-0.5">
+                                <i class="fa-solid fa-eye text-[10px]"></i> Lihat Selengkapnya
+                            </button>
+                            <div class="pt-1.5 flex items-center gap-1.5 text-[11px] ${isDeadlinePassed ? 'text-red-400 font-semibold' : 'text-amber-400 font-medium'}">
                                 <i class="fa-regular fa-clock"></i> Tenggat: ${deadlineText} ${isDeadlinePassed ? '(Berakhir)' : ''}
                             </div>
                         </div>
@@ -593,6 +499,16 @@
                     </div>
                 `;
             });
+        }
+
+        function openTaskDetailModal(title, description) {
+            document.getElementById('detail-modal-title').innerHTML = `<i class="fa-solid fa-circle-info text-blue-400"></i> ${title.replace(/&apos;/g, "'").replace(/&quot;/g, '"')}`;
+            document.getElementById('detail-modal-desc').innerHTML = description.replace(/&apos;/g, "'").replace(/&quot;/g, '"').replace(/\n/g, '<br>');
+            document.getElementById('task-detail-modal').classList.remove('hidden');
+        }
+
+        function closeTaskDetailModal() {
+            document.getElementById('task-detail-modal').classList.add('hidden');
         }
 
         function calculateGradeLetter(score) {
@@ -762,10 +678,11 @@
 
             if (certificateAccess) {
                 statusText.textContent = "Selamat! Anda telah dinyatakan lulus dan akses sertifikat telah dibuka oleh pengajar.";
+                // Langsung mengarahkan ke halaman sertifikat.html di tab baru
                 actionArea.innerHTML = `
-                    <button onclick="openCertificateModal()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-6 py-3 rounded-xl shadow-lg shadow-amber-600/30 transition inline-flex items-center gap-2">
+                    <a href="sertifikat.html" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-6 py-3 rounded-xl shadow-lg shadow-amber-600/30 transition inline-flex items-center gap-2">
                         <i class="fa-solid fa-award text-sm"></i> Lihat & Download Dokumen Kelulusan
-                    </button>
+                    </a>
                 `;
             } else {
                 statusText.textContent = "Sertifikat belum tersedia. Akses akan dibuka oleh pengajar setelah Anda menyelesaikan seluruh materi dan tugas.";
@@ -775,128 +692,6 @@
                     </button>
                 `;
             }
-        }
-
-        async function openCertificateModal() {
-            document.getElementById('cert-student-name').textContent = studentName;
-            document.getElementById('raport-student-name').textContent = studentName;
-            document.getElementById('raport-class-level').textContent = studentClass === 'senior' ? '12' : (studentClass === 'junior' ? '6' : '3');
-
-            // Set Tanggal Realtime saat ini
-            const now = new Date();
-            const options = { day: 'numeric', month: 'long', year: 'numeric' };
-            const formattedCurrentDate = now.toLocaleDateString('id-ID', options);
-            
-            document.getElementById('cert-realtime-date').textContent = `Cilegon, ${formattedCurrentDate}`;
-            document.getElementById('raport-realtime-date').textContent = formattedCurrentDate;
-            document.getElementById('raport-realtime-location-date').innerHTML = `Cilegon, ${formattedCurrentDate}<br>Trainer Pengampu`;
-
-            // Ambil Nama Trainer secara dinamis berdasarkan kelas yang diampu guru di database
-            let trainerDisplayName = "Mentor Pengampu";
-            try {
-                const { data: teacherProfile } = await db
-                    .from('profiles')
-                    .select('name')
-                    .eq('role', 'teacher')
-                    .eq('target_class', studentClass)
-                    .maybeSingle();
-
-                if (teacherProfile && teacherProfile.name) {
-                    trainerDisplayName = teacherProfile.name;
-                } else {
-                    const { data: anyTeacher } = await db
-                        .from('profiles')
-                        .select('name')
-                        .eq('role', 'teacher')
-                        .limit(1)
-                        .maybeSingle();
-                    if (anyTeacher && anyTeacher.name) {
-                        trainerDisplayName = anyTeacher.name;
-                    }
-                }
-            } catch (err) {
-                console.error("Gagal mengambil nama trainer:", err);
-            }
-
-            document.getElementById('cert-trainer-name').textContent = trainerDisplayName;
-            document.getElementById('raport-trainer-name').textContent = trainerDisplayName;
-
-            // Memuat transkrip nilai secara dinamis dari tabel tugas dan submission siswa
-            const raportTbody = document.getElementById('raport-dynamic-tbody');
-            raportTbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-500">Memuat data nilai tugas...</td></tr>`;
-
-            const { data: tasks } = await db.from('tasks').select('*').eq('target_class', studentClass).order('created_at', { ascending: true });
-            const { data: submissions } = await db.from('task_submissions').select('*').eq('student_id', studentId);
-
-            const subMap = {};
-            if (submissions) {
-                submissions.forEach(s => { subMap[s.task_id] = s; });
-            }
-
-            if (!tasks || tasks.length === 0) {
-                raportTbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-500">Belum ada tugas atau transkrip untuk kelas ini.</td></tr>`;
-            } else {
-                raportTbody.innerHTML = '';
-                tasks.forEach((t, idx) => {
-                    const sub = subMap[t.id];
-                    const gradeVal = (sub && sub.grade !== null && sub.grade !== undefined) ? sub.grade : '-';
-                    let letterGrade = '-';
-                    if (sub && sub.grade !== null && sub.grade !== undefined) {
-                        const score = Number(sub.grade);
-                        if (score >= 85) letterGrade = 'A (Sangat Baik)';
-                        else if (score >= 76) letterGrade = 'B (Baik)';
-                        else letterGrade = 'C (Cukup)';
-                    }
-                    const statusKet = (sub && sub.grade !== null && sub.grade !== undefined) ? `Tuntas (${letterGrade})` : (sub ? 'Menunggu Penilaian' : 'Belum Dikerjakan');
-
-                    raportTbody.innerHTML += `
-                        <tr>
-                            <td class="border border-slate-300 py-3 px-3 text-center font-medium">${idx + 1}</td>
-                            <td class="border border-slate-300 py-3 px-4 font-semibold">${t.title}</td>
-                            <td class="border border-slate-300 py-3 px-3 text-center font-bold text-blue-900">${gradeVal}</td>
-                            <td class="border border-slate-300 py-3 px-4 text-slate-600">${statusKet}</td>
-                        </tr>
-                    `;
-                });
-            }
-
-            document.getElementById('certificate-modal').classList.remove('hidden');
-        }
-
-        function closeCertificateModal() {
-            document.getElementById('certificate-modal').classList.add('hidden');
-        }
-
-        // Fungsi Download Presisi Ukuran A4 Landscape (297x210 mm)
-        function downloadSingleFilePDF() {
-            const packageElement = document.getElementById('printable-package');
-            if (!packageElement) {
-                alert('Elemen dokumen tidak ditemukan!');
-                return;
-            }
-
-            const opt = {
-                margin:        0,
-                filename:      `Sertifikat_Dan_Transkrip_${studentName.replace(/\s+/g, '_')}.pdf`,
-                image:         { type: 'jpeg', quality: 0.98 },
-                html2canvas:   { scale: 3, useCORS: true, letterRendering: true, logging: false },
-                jsPDF:         { unit: 'mm', format: 'a4', orientation: 'landscape' }
-            };
-
-            const btn = event.currentTarget;
-            const originalHtml = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Memproses PDF A4...`;
-
-            html2pdf().from(packageElement).set(opt).save().then(() => {
-                btn.disabled = false;
-                btn.innerHTML = originalHtml;
-            }).catch(err => {
-                console.error("Error generating PDF:", err);
-                alert('Gagal mendownload PDF. Pastikan browser Anda mengizinkan unduhan pop-up.');
-                btn.disabled = false;
-                btn.innerHTML = originalHtml;
-            });
         }
 
         function toggleSidebarCollapse() {

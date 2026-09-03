@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Guru - STREAM LMS</title>
+    <title>Dashboard Guru - TECH-C LMS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -38,7 +38,6 @@
 </head>
 <body class="tech-bg min-h-screen text-slate-200 selection:bg-blue-500 selection:text-white flex overflow-x-hidden font-sans">
 
-    <!-- SIDEBAR -->
     <aside id="sidebar" class="w-72 bg-slate-950/90 backdrop-blur-2xl border-r border-slate-800/60 flex flex-col justify-between p-6 shrink-0 relative z-30 shadow-2xl transition-all duration-300 h-screen sticky top-0">
         <div class="overflow-y-auto overflow-x-hidden pr-1 space-y-4 flex-1 scrollbar-thin">
             <div class="flex items-center justify-between mb-6">
@@ -47,7 +46,7 @@
                         <i class="fa-solid fa-chalkboard-user text-lg"></i>
                     </div>
                     <div class="sidebar-text truncate">
-                        <h1 class="text-sm font-bold text-white tracking-wider">STREAM LMS</h1>
+                        <h1 class="text-sm font-bold text-white tracking-wider">TECH-C LMS</h1>
                         <p class="text-[11px] text-slate-400 font-medium">Portal Pengajar</p>
                     </div>
                 </div>
@@ -98,10 +97,8 @@
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <div class="flex-1 flex flex-col min-h-screen w-full p-6 sm:p-10 justify-start overflow-y-auto">
         
-        <!-- HEADER -->
         <div class="max-w-4xl mx-auto w-full mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-3xl p-6 shadow-xl">
             <div>
                 <h2 class="text-xl font-bold text-white tracking-tight">Selamat Datang, <span id="welcome-teacher-name">Trainer</span> 👨‍🏫</h2>
@@ -115,7 +112,6 @@
 
         <main class="max-w-4xl mx-auto w-full space-y-8 flex-1">
             
-            <!-- SECTION 1: KELOLA AKSES SISWA -->
             <div id="section-akses" class="space-y-6">
                 <div class="bg-gradient-to-br from-slate-900/80 via-slate-900/50 to-blue-950/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 relative overflow-hidden shadow-2xl">
                     <span class="inline-block text-[11px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full mb-3">Persetujuan Akun</span>
@@ -126,7 +122,6 @@
                 </div>
             </div>
 
-            <!-- SECTION 2: ABSENSI HARIAN SISWA -->
             <div id="section-absensi" class="space-y-6 hidden">
                 <div class="bg-gradient-to-br from-slate-900/80 via-slate-900/50 to-indigo-950/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 relative overflow-hidden shadow-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -205,7 +200,6 @@
                 </div>
             </div>
 
-            <!-- SECTION 3: KELOLA MATERI -->
             <div id="section-materi" class="space-y-6 hidden">
                 <div class="bg-gradient-to-br from-slate-900/85 via-slate-900/50 to-blue-950/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 relative overflow-hidden shadow-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -227,7 +221,7 @@
                         <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Pilih Tingkatan Kelas Tujuan</label>
                         <select id="upload-target-class" class="w-full px-4 py-3 text-sm text-white bg-slate-950/60 border border-slate-800 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
                             <option value="junior-a">Kelas Junior A</option>
-                            <option value="junior">Kelas Junior B</option>
+                            <option value="junior-b">Kelas Junior B</option>
                             <option value="senior">Kelas Senior</option>
                         </select>
                     </div>
@@ -253,7 +247,6 @@
                 </div>
             </div>
 
-            <!-- SECTION 4: KELOLA TUGAS -->
             <div id="section-tugas" class="space-y-6 hidden">
                 <div class="bg-gradient-to-br from-slate-900/85 via-slate-900/50 to-indigo-950/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 relative overflow-hidden shadow-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -275,7 +268,7 @@
                         <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Pilih Tingkatan Kelas Tujuan</label>
                         <select id="task-target-class" class="w-full px-4 py-3 text-sm text-white bg-slate-950/60 border border-slate-800 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
                             <option value="junior-a">Kelas Junior A</option>
-                            <option value="junior">Kelas Junior B</option>
+                            <option value="junior-b">Kelas Junior B</option>
                             <option value="senior">Kelas Senior</option>
                         </select>
                     </div>
@@ -301,7 +294,6 @@
                 </div>
             </div>
 
-            <!-- SECTION 5: SERTIFIKAT SISWA -->
             <div id="section-sertifikat" class="space-y-6 hidden">
                 <div class="bg-gradient-to-br from-slate-900/85 via-slate-900/50 to-amber-950/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 relative overflow-hidden shadow-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -335,7 +327,6 @@
         </main>
     </div>
 
-    <!-- MODAL EDIT MATERI -->
     <div id="edit-material-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full flex flex-col shadow-2xl overflow-hidden p-6 space-y-5">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -347,7 +338,7 @@
                 <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Tingkatan Kelas</label>
                 <select id="edit-mat-class" class="w-full px-4 py-3 text-sm text-white bg-slate-950/60 border border-slate-800 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     <option value="junior-a">Kelas Junior A</option>
-                    <option value="junior">Kelas Junior B</option>
+                    <option value="junior-b">Kelas Junior B</option>
                     <option value="senior">Kelas Senior</option>
                 </select>
             </div>
@@ -366,7 +357,6 @@
         </div>
     </div>
 
-    <!-- MODAL EDIT TUGAS -->
     <div id="edit-task-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full flex flex-col shadow-2xl overflow-hidden p-6 space-y-5">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -379,7 +369,7 @@
                     <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Tingkatan Kelas</label>
                     <select id="edit-task-class" class="w-full px-4 py-3 text-sm text-white bg-slate-950/60 border border-slate-800 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         <option value="junior-a">Kelas Junior A</option>
-                        <option value="junior">Kelas Junior B</option>
+                        <option value="junior-b">Kelas Junior B</option>
                         <option value="senior">Kelas Senior</option>
                     </select>
                 </div>
@@ -403,7 +393,6 @@
         </div>
     </div>
 
-    <!-- MODAL PENILAIAN TUGAS -->
     <div id="submissions-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
@@ -450,7 +439,6 @@
         </div>
     </div>
 
-    <!-- MODAL VIEWER MATERI DALAM WEB (TANPA DOWNLOAD) -->
     <div id="material-viewer-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-4xl w-full h-[85vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
@@ -462,13 +450,11 @@
                 </button>
             </div>
             <div class="flex-1 bg-slate-950 p-2 relative flex items-center justify-center">
-                <!-- Mematikan toolbar / tombol download dengan parameter #toolbar=0 dan proteksi CSS -->
                 <iframe id="pdf-viewer-iframe" src="" class="w-full h-full rounded-2xl border border-slate-800"></iframe>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT UTAMA -->
     <script>
         const SUPABASE_URL = 'https://rwuaqlwpieuiqwfotkkz.supabase.co';
         const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ow_W7UPe5i6XkS0phs4btw_3ff3abUt';
@@ -508,7 +494,7 @@
 
                     let labelText = "Semua Kelas (Head Trainer)";
                     if (teacherAssignedClass === 'junior-a') labelText = "Khusus Kelas Junior A";
-                    else if (teacherAssignedClass === 'junior') labelText = "Khusus Kelas Junior B";
+                    else if (teacherAssignedClass === 'junior-b') labelText = "Khusus Kelas Junior B";
                     else if (teacherAssignedClass === 'senior') labelText = "Khusus Kelas Senior";
 
                     document.getElementById('header-assigned-label').textContent = labelText;
@@ -549,11 +535,10 @@
 
         function calculateGradeLetter(score) {
             if (score === null || score === undefined || isNaN(score)) return '-';
-            if (score >= 85) return 'A';
-            if (score >= 70) return 'B';
-            if (score >= 55) return 'C';
-            if (score >= 40) return 'D';
-            return 'E';
+            if (score >= 86) return 'A'; // 86 - 100
+            if (score >= 76) return 'B'; // 76 - 85
+            if (score >= 41) return 'C'; // 41 - 75
+            return 'D'; // 0 - 40 (Perlu Bimbingan)
         }
 
         async function loadTeacherCertificates() {
@@ -577,14 +562,22 @@
                 const hasAccess = st.certificate_access === true;
 
                 let accessBtn = hasAccess ?
-                    `<button onclick="toggleCertificateAccess('${st.id}', false)" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white text-xs font-semibold px-4 py-2 rounded-xl transition border border-red-500/30">Tutup Akses</button>` :
-                    `<button onclick="toggleCertificateAccess('${st.id}', true)" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition shadow">Buka Akses Sertifikat</button>`;
+                    `<button onclick="toggleCertificateAccess('${st.id}', false)" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white text-xs font-semibold px-3 py-2 rounded-xl transition border border-red-500/30">Tutup Akses</button>` :
+                    `<button onclick="toggleCertificateAccess('${st.id}', true)" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-3 py-2 rounded-xl transition shadow">Buka Akses Sertifikat</button>`;
+
+                // Tombol cetak sertifikat yang terhubung ke file sertifikat.html
+                let printBtn = `<a href="sertifikat.html?id=${st.id}" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition shadow inline-flex items-center gap-1.5"><i class="fa-solid fa-print"></i> Cetak Sertifikat</a>`;
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-800/30 transition">
                         <td class="py-3 px-4 font-bold text-white">${st.name}</td>
                         <td class="py-3 px-4"><span class="uppercase font-semibold text-blue-400">${sClass}</span></td>
-                        <td class="py-3 px-4 text-center">${accessBtn}</td>
+                        <td class="py-3 px-4 text-center">
+                            <div class="inline-flex items-center justify-center gap-2">
+                                ${accessBtn}
+                                ${printBtn}
+                            </div>
+                        </td>
                     </tr>
                 `;
             });
@@ -888,7 +881,7 @@
             document.getElementById('modal-task-class').textContent = `Kelas: ${targetClass.toUpperCase()}`;
             
             const colHeader = document.getElementById('submission-col-header');
-            if (targetClass === 'junior-a' || targetClass === 'junior') {
+            if (targetClass === 'junior-a' || targetClass === 'junior-b') {
                 colHeader.textContent = 'File Tugas Siswa';
             } else {
                 colHeader.textContent = 'Link Tugas';
@@ -942,7 +935,7 @@
                 const calculatedLetter = calculateGradeLetter(sub.grade);
 
                 let submissionDisplay = '';
-                if (targetClass === 'junior-a' || targetClass === 'junior') {
+                if (targetClass === 'junior-a' || targetClass === 'junior-b') {
                     submissionDisplay = `
                         <a href="${sub.submission_link}" target="_blank" class="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 text-[11px] font-semibold underline truncate max-w-[140px]">
                             <i class="fa-solid fa-file-arrow-down text-[10px]"></i> Unduh File Siswa
@@ -1446,7 +1439,7 @@
 
         async function handleLogout() {
             await db.auth.signOut();
-            window.location.href = '/';
+            window.location.href = 'index.html';
         }
     </script>
 </body>
