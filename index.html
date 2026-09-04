@@ -207,11 +207,11 @@
                 const userRole = profile ? profile.role : 'student';
 
                 if (email === 'superadmin@gmail.com' || userRole === 'super_admin' || userRole === 'admin') {
-                    window.location.href = 'admin-dashboard.html';
+                    window.location.href = 'admin';
                 } else if (userRole === 'teacher') {
-                    window.location.href = 'teacher-dashboard.html';
+                    window.location.href = 'teacher';
                 } else {
-                    window.location.href = 'student-dashboard.html';
+                    window.location.href = 'student';
                 }
 
             } catch (error) {
