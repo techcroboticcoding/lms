@@ -853,10 +853,22 @@
             btn.innerText = 'Menyimpan...';
 
             try {
-                const fakeUserId = crypto.randomUUID ? crypto.randomUUID() : 'id_' + Math.random().toString(36).substring(2, 15);
+                const cleanNameForEmail = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                const dummyEmail = `${cleanNameForEmail}_${Date.now()}@tech-c.internal`;
+                const dummyPassword = 'techc_password123';
 
-                const { error } = await db.from('profiles').insert([{
-                    id: fakeUserId,
+                const { data: authData, error: authError } = await db.auth.signUp({
+                    email: dummyEmail,
+                    password: dummyPassword,
+                });
+
+                if (authError) throw authError;
+
+                const userId = authData.user ? authData.user.id : null;
+                if (!userId) throw new Error('Gagal mendapatkan ID autentikasi sistem.');
+
+                const { error: profileError } = await db.from('profiles').insert([{
+                    id: userId,
                     name: name,
                     school: school || 'Mandiri / TECH-C',
                     target_class: targetClass,
@@ -866,7 +878,7 @@
                     certificate_access: false
                 }]);
 
-                if (error) throw error;
+                if (profileError) throw profileError;
 
                 alert(`Siswa "${name}" berhasil ditambahkan dan langsung aktif di sistem!`);
                 closeAddStudentModal();
@@ -1022,7 +1034,6 @@
             }
         }
 
-        // Fungsionalitas Modul Penilaian untuk SEMUA Kelas (Termasuk Junior A & B Tanpa Upload File)
         async function openSubmissionsModal(taskId, taskTitle, targetClass) {
             activeTaskId = taskId;
             activeTaskTitle = taskTitle.replace(/&apos;/g, "'").replace(/&quot;/g, '"');
@@ -1043,7 +1054,6 @@
             const tbody = document.getElementById('modal-submissions-tbody');
             tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400">Memuat data siswa dan nilai...</td></tr>`;
 
-            // 1. Ambil seluruh siswa aktif di kelas tersebut
             const { data: students, error: studentError } = await db
                 .from('profiles')
                 .select('id, name, school, target_class')
@@ -1058,7 +1068,6 @@
                 return;
             }
 
-            // 2. Ambil data pengumpulan nilai yang sudah tersimpan di database
             const { data: submissions } = await db
                 .from('task_submissions')
                 .select('*')
@@ -1071,7 +1080,6 @@
                 });
             }
 
-            // 3. Petakan seluruh siswa ke dalam tabel penilaian
             currentModalSubmissions = students.map(st => {
                 const existingSub = submissionMap[st.id];
                 return {
@@ -1131,7 +1139,6 @@
                     ` : `<span class="text-slate-500 italic text-[11px]">Belum kumpul</span>`;
                 }
 
-                // Gunakan student_id sebagai kunci unik baris untuk siswa Junior/Senior
                 const uniqueKey = sub.student_id;
 
                 tbody.innerHTML += `
@@ -1203,7 +1210,6 @@
             if (!targetSub) return;
 
             if (targetSub.id) {
-                // Update jika data submission sudah ada
                 const { error } = await db.from('task_submissions').update({ 
                     grade: parseInt(gradeVal), 
                     feedback: feedbackVal, 
@@ -1216,7 +1222,6 @@
                     openSubmissionsModal(activeTaskId, activeTaskTitle, activeTaskClass);
                 }
             } else {
-                // Insert baru jika siswa belum memiliki record submission (khusus Junior A & B)
                 const { error } = await db.from('task_submissions').insert([{
                     task_id: activeTaskId,
                     student_id: targetSub.student_id,
