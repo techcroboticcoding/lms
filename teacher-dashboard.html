@@ -30,9 +30,14 @@
             padding-left: 1rem !important;
             padding-right: 1rem !important;
         }
-        /* Mematikan interaksi elemen kontrol PDF agar tidak mudah didownload user */
         .no-download-pdf {
             pointer-events: none;
+        }
+        .feedback-textarea {
+            resize: vertical;
+            min-height: 38px;
+            max-height: 120px;
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -113,9 +118,14 @@
         <main class="max-w-4xl mx-auto w-full space-y-8 flex-1">
             
             <div id="section-akses" class="space-y-6">
-                <div class="bg-gradient-to-br from-slate-900/80 via-slate-900/50 to-blue-950/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 relative overflow-hidden shadow-2xl">
-                    <span class="inline-block text-[11px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full mb-3">Persetujuan Akun</span>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">Permintaan Pendaftaran Siswa Baru</h2>
+                <div class="bg-gradient-to-br from-slate-900/80 via-slate-900/50 to-blue-950/30 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 relative overflow-hidden shadow-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <span class="inline-block text-[11px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full mb-3">Persetujuan Akun</span>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">Permintaan Pendaftaran Siswa Baru</h2>
+                    </div>
+                    <button onclick="openAddStudentModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-5 py-3 rounded-2xl shadow-lg shadow-blue-600/30 transition flex items-center gap-2 shrink-0">
+                        <i class="fa-solid fa-user-plus text-sm"></i> Tambah Siswa Manual
+                    </button>
                 </div>
                 <div id="students-container" class="space-y-4">
                     <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 text-center text-slate-400 text-xs">Memuat data pendaftaran...</div>
@@ -327,6 +337,54 @@
         </main>
     </div>
 
+    <!-- MODAL TAMBAH SISWA MANUAL -->
+    <div id="add-student-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full flex flex-col shadow-2xl overflow-hidden p-6 space-y-5">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-user-plus mr-2 text-blue-400"></i> Tambah Siswa Manual</h3>
+                <button onclick="closeAddStudentModal()" class="text-slate-400 hover:text-white text-xs"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Nama Lengkap Siswa</label>
+                <input type="text" id="manual-student-name" placeholder="Contoh: Budi Santoso" class="w-full px-4 py-3 text-sm text-white placeholder-slate-500 bg-slate-950/60 border border-slate-800 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Asal Sekolah / Keterangan (Opsional)</label>
+                <input type="text" id="manual-student-school" placeholder="Contoh: SMPN 1 Cilegon" class="w-full px-4 py-3 text-sm text-white placeholder-slate-500 bg-slate-950/60 border border-slate-800 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Pilih Tingkatan Kelas</label>
+                <select id="manual-student-class" class="w-full px-4 py-3 text-sm text-white bg-slate-950/60 border border-slate-800 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="junior-a">Kelas Junior A</option>
+                    <option value="junior-b">Kelas Junior B</option>
+                    <option value="senior">Kelas Senior</option>
+                </select>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeAddStudentModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold py-3 rounded-xl transition">Batal</button>
+                <button onclick="handleCreateManualStudent()" id="save-manual-student-btn" class="w-1/2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-3 rounded-xl transition shadow-lg shadow-blue-600/25">Simpan Siswa</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETAIL / LIHAT SELENGKAPNYA DESKRIPSI TUGAS -->
+    <div id="task-detail-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full flex flex-col shadow-2xl overflow-hidden p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 id="modal-detail-title" class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info text-blue-400"></i> Detail Instruksi Tugas
+                </h3>
+                <button onclick="closeTaskDetailModal()" class="text-slate-400 hover:text-white text-xs"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="max-h-[60vh] overflow-y-auto pr-1">
+                <p id="modal-detail-desc" class="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap font-mono bg-slate-950/50 p-4 rounded-2xl border border-slate-800/80"></p>
+            </div>
+            <div class="pt-2 flex justify-end">
+                <button onclick="closeTaskDetailModal()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition">Tutup</button>
+            </div>
+        </div>
+    </div>
+
     <div id="edit-material-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full flex flex-col shadow-2xl overflow-hidden p-6 space-y-5">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -393,6 +451,7 @@
         </div>
     </div>
 
+    <!-- MODAL PENGUMPULAN TUGAS / PENILAIAN SISWA -->
     <div id="submissions-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
@@ -400,18 +459,23 @@
                     <span id="modal-task-class" class="text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-0.5 rounded-md">Kelas</span>
                     <h3 id="modal-task-title" class="text-lg font-bold text-white mt-1">Judul Tugas</h3>
                 </div>
-                <button onclick="closeSubmissionsModal()" class="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
+                <div class="flex items-center gap-3">
+                    <button onclick="saveAllGrades()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-lg shadow-blue-600/30 flex items-center gap-2">
+                        <i class="fa-solid fa-floppy-disk text-xs"></i> Simpan Semua
+                    </button>
+                    <button onclick="closeSubmissionsModal()" class="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
             </div>
             <div class="p-6 overflow-y-auto flex-1 space-y-4">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="border-b border-slate-800 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                                <th class="py-3 px-3 w-[20%]">Siswa</th>
-                                <th class="py-3 px-3 w-[20%]" id="submission-col-header">Hasil Tugas / Link</th>
-                                <th class="py-3 px-3 w-[20%]">Catatan</th>
+                                <th class="py-3 px-3 w-[25%]">Siswa</th>
+                                <th class="py-3 px-3 w-[20%]" id="submission-col-header">Status / Keterangan</th>
+                                <th class="py-3 px-3 w-[15%]">Catatan</th>
                                 <th class="py-3 px-3 w-[40%] text-right">Penilaian & Feedback</th>
                             </tr>
                         </thead>
@@ -565,7 +629,6 @@
                     `<button onclick="toggleCertificateAccess('${st.id}', false)" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white text-xs font-semibold px-3 py-2 rounded-xl transition border border-red-500/30">Tutup Akses</button>` :
                     `<button onclick="toggleCertificateAccess('${st.id}', true)" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-3 py-2 rounded-xl transition shadow">Buka Akses Sertifikat</button>`;
 
-                // Tombol cetak sertifikat yang terhubung ke file sertifikat.html
                 let printBtn = `<a href="sertifikat.html?id=${st.id}" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition shadow inline-flex items-center gap-1.5"><i class="fa-solid fa-print"></i> Cetak Sertifikat</a>`;
 
                 tbody.innerHTML += `
@@ -701,7 +764,8 @@
                 }
 
                 const safeTitle = t.title.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
-                const safeDesc = t.description ? t.description.replace(/'/g, "&apos;").replace(/"/g, "&quot;").replace(/\n/g, '\\n') : '';
+                const rawDescText = t.description ? t.description : '';
+                const safeDesc = rawDescText.replace(/'/g, "&apos;").replace(/"/g, "&quot;").replace(/\n/g, '\\n');
 
                 gridContainer.innerHTML += `
                     <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 flex flex-col justify-between space-y-4 shadow-xl hover:border-indigo-500/50 transition">
@@ -718,7 +782,12 @@
                                 </div>
                             </div>
                             <h4 class="text-sm font-bold text-white line-clamp-1">${t.title}</h4>
-                            <p class="text-xs text-slate-400 line-clamp-2">${t.description}</p>
+                            <div>
+                                <p class="text-xs text-slate-400 line-clamp-2">${rawDescText}</p>
+                                <button onclick="openTaskDetailModal('${safeTitle}', '${safeDesc}')" class="mt-1 text-[11px] font-semibold text-blue-400 hover:text-blue-300 transition inline-flex items-center gap-1">
+                                    Lihat Selengkapnya <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                                </button>
+                            </div>
                             <div class="pt-1 flex items-center gap-1.5 text-[11px] text-amber-400 font-medium">
                                 <i class="fa-regular fa-clock"></i> Tenggat: ${deadlineText}
                             </div>
@@ -731,6 +800,87 @@
                     </div>
                 `;
             });
+        }
+
+        function openTaskDetailModal(title, desc) {
+            const cleanTitle = title.replace(/&apos;/g, "'").replace(/&quot;/g, '"');
+            const cleanDesc = desc.replace(/&apos;/g, "'").replace(/&quot;/g, '"').replace(/\\n/g, '\n');
+
+            document.getElementById('modal-detail-title').innerHTML = `<i class="fa-solid fa-circle-info text-blue-400"></i> ${cleanTitle}`;
+            document.getElementById('modal-detail-desc').textContent = cleanDesc || 'Tidak ada instruksi khusus.';
+            document.getElementById('task-detail-modal').classList.remove('hidden');
+        }
+
+        function closeTaskDetailModal() {
+            document.getElementById('task-detail-modal').classList.add('hidden');
+        }
+
+        function openAddStudentModal() {
+            document.getElementById('manual-student-name').value = '';
+            document.getElementById('manual-student-school').value = '';
+            
+            const classSelect = document.getElementById('manual-student-class');
+            if (teacherAssignedClass !== 'all') {
+                classSelect.value = teacherAssignedClass;
+                classSelect.disabled = true;
+            } else {
+                classSelect.disabled = false;
+            }
+
+            document.getElementById('add-student-modal').classList.remove('hidden');
+        }
+
+        function closeAddStudentModal() {
+            document.getElementById('add-student-modal').classList.add('hidden');
+        }
+
+        async function handleCreateManualStudent() {
+            const name = document.getElementById('manual-student-name').value.trim();
+            const school = document.getElementById('manual-student-school').value.trim();
+            let targetClass = document.getElementById('manual-student-class').value;
+            const btn = document.getElementById('save-manual-student-btn');
+
+            if (!name) {
+                alert('Nama lengkap siswa wajib diisi!');
+                return;
+            }
+
+            if (teacherAssignedClass !== 'all') {
+                targetClass = teacherAssignedClass;
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'Menyimpan...';
+
+            try {
+                const fakeUserId = crypto.randomUUID ? crypto.randomUUID() : 'id_' + Math.random().toString(36).substring(2, 15);
+
+                const { error } = await db.from('profiles').insert([{
+                    id: fakeUserId,
+                    name: name,
+                    school: school || 'Mandiri / TECH-C',
+                    target_class: targetClass,
+                    role: 'student',
+                    status_approval: 'approved',
+                    is_approved: true,
+                    certificate_access: false
+                }]);
+
+                if (error) throw error;
+
+                alert(`Siswa "${name}" berhasil ditambahkan dan langsung aktif di sistem!`);
+                closeAddStudentModal();
+                
+                loadStudents();
+                loadActiveStudents();
+                loadTeacherCertificates();
+
+            } catch (error) {
+                alert('Gagal menambahkan siswa: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Simpan Siswa';
+            }
         }
 
         async function deleteMaterial(matId) {
@@ -872,6 +1022,7 @@
             }
         }
 
+        // Fungsionalitas Modul Penilaian untuk SEMUA Kelas (Termasuk Junior A & B Tanpa Upload File)
         async function openSubmissionsModal(taskId, taskTitle, targetClass) {
             activeTaskId = taskId;
             activeTaskTitle = taskTitle.replace(/&apos;/g, "'").replace(/&quot;/g, '"');
@@ -882,7 +1033,7 @@
             
             const colHeader = document.getElementById('submission-col-header');
             if (targetClass === 'junior-a' || targetClass === 'junior-b') {
-                colHeader.textContent = 'File Tugas Siswa';
+                colHeader.textContent = 'Status / Praktikum Kelas';
             } else {
                 colHeader.textContent = 'Link Tugas';
             }
@@ -890,19 +1041,50 @@
             document.getElementById('submissions-modal').classList.remove('hidden');
 
             const tbody = document.getElementById('modal-submissions-tbody');
-            tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400">Memuat data pengumpulan siswa...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400">Memuat data siswa dan nilai...</td></tr>`;
 
-            const { data: submissions, error } = await db
-                .from('task_submissions')
-                .select(`*, profiles ( name, school, target_class )`)
-                .eq('task_id', taskId)
-                .order('submitted_at', { ascending: false });
+            // 1. Ambil seluruh siswa aktif di kelas tersebut
+            const { data: students, error: studentError } = await db
+                .from('profiles')
+                .select('id, name, school, target_class')
+                .eq('role', 'student')
+                .eq('status_approval', 'approved')
+                .eq('target_class', targetClass)
+                .order('name', { ascending: true });
 
-            if (error || !submissions) {
+            if (studentError || !students || students.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400">Belum ada siswa aktif terdaftar di kelas ${targetClass.toUpperCase()}. Silakan tambahkan siswa manual terlebih dahulu.</td></tr>`;
                 currentModalSubmissions = [];
-            } else {
-                currentModalSubmissions = submissions;
+                return;
             }
+
+            // 2. Ambil data pengumpulan nilai yang sudah tersimpan di database
+            const { data: submissions } = await db
+                .from('task_submissions')
+                .select('*')
+                .eq('task_id', taskId);
+
+            const submissionMap = {};
+            if (submissions) {
+                submissions.forEach(sub => {
+                    submissionMap[sub.student_id] = sub;
+                });
+            }
+
+            // 3. Petakan seluruh siswa ke dalam tabel penilaian
+            currentModalSubmissions = students.map(st => {
+                const existingSub = submissionMap[st.id];
+                return {
+                    id: existingSub ? existingSub.id : null,
+                    student_id: st.id,
+                    task_id: taskId,
+                    submission_link: existingSub ? existingSub.submission_link : '#',
+                    notes: existingSub ? existingSub.notes : (targetClass.includes('junior') ? 'Praktikum Kelas Langsung' : '-'),
+                    grade: existingSub ? existingSub.grade : null,
+                    feedback: existingSub ? existingSub.feedback : '',
+                    profiles: { name: st.name, school: st.school }
+                };
+            });
 
             currentModalPage = 1;
             renderModalSubmissionsTable(targetClass);
@@ -914,7 +1096,7 @@
             if (!tbody) return;
 
             if (currentModalSubmissions.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400">Belum ada siswa yang mengumpulkan tugas ini.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400">Belum ada siswa terdaftar.</td></tr>`;
                 if (paginationEl) paginationEl.classList.add('hidden');
                 return;
             }
@@ -937,20 +1119,23 @@
                 let submissionDisplay = '';
                 if (targetClass === 'junior-a' || targetClass === 'junior-b') {
                     submissionDisplay = `
-                        <a href="${sub.submission_link}" target="_blank" class="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 text-[11px] font-semibold underline truncate max-w-[140px]">
-                            <i class="fa-solid fa-file-arrow-down text-[10px]"></i> Unduh File Siswa
-                        </a>
+                        <span class="inline-flex items-center gap-1 text-emerald-400 text-[11px] font-semibold bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                            <i class="fa-solid fa-chalkboard-user text-[10px]"></i> Hadir & Praktikum
+                        </span>
                     `;
                 } else {
-                    submissionDisplay = `
+                    submissionDisplay = sub.submission_link !== '#' ? `
                         <a href="${sub.submission_link}" target="_blank" class="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 text-[11px] font-semibold underline truncate max-w-[120px]">
                             <i class="fa-solid fa-external-link-alt text-[9px]"></i> Buka Link
                         </a>
-                    `;
+                    ` : `<span class="text-slate-500 italic text-[11px]">Belum kumpul</span>`;
                 }
 
+                // Gunakan student_id sebagai kunci unik baris untuk siswa Junior/Senior
+                const uniqueKey = sub.student_id;
+
                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-800/30 transition align-middle">
+                    <tr class="hover:bg-slate-800/30 transition align-top">
                         <td class="py-3 px-3">
                             <p class="font-bold text-white text-xs">${studentName}</p>
                             <p class="text-[10px] text-slate-400">${studentSchool}</p>
@@ -964,13 +1149,13 @@
                             </span>
                         </td>
                         <td class="py-3 px-3 text-right">
-                            <div class="inline-flex items-center justify-end gap-2">
+                            <div class="flex items-start justify-end gap-2">
                                 <div class="relative flex items-center">
-                                    <input type="number" id="grade-${sub.id}" value="${currentGrade}" oninput="onGradeInputChanged('${sub.id}')" placeholder="Nilai" class="w-14 px-2 py-1 text-xs text-center text-white bg-slate-950/60 border border-slate-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                    <span id="letter-badge-${sub.id}" class="ml-1.5 px-2 py-0.5 text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40 rounded">${calculatedLetter}</span>
+                                    <input type="number" id="grade-${uniqueKey}" value="${currentGrade}" oninput="onGradeInputChanged('${uniqueKey}')" placeholder="Nilai" class="w-14 px-2 py-1 text-xs text-center text-white bg-slate-950/60 border border-slate-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                    <span id="letter-badge-${uniqueKey}" class="ml-1.5 px-2 py-0.5 text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40 rounded">${calculatedLetter}</span>
                                 </div>
-                                <input type="text" id="feedback-${sub.id}" value="${sub.feedback || ''}" placeholder="Feedback..." class="w-28 sm:w-36 px-2 py-1 text-xs text-white bg-slate-950/60 border border-slate-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                <button onclick="saveGrade('${sub.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-semibold px-3 py-1 rounded-lg transition shadow">Simpan</button>
+                                <textarea id="feedback-${uniqueKey}" placeholder="Feedback..." class="feedback-textarea w-32 sm:w-40 px-2.5 py-1.5 text-xs text-white bg-slate-950/60 border border-slate-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">${sub.feedback || ''}</textarea>
+                                <button onclick="saveGrade('${uniqueKey}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg transition shadow shrink-0">Simpan</button>
                             </div>
                         </td>
                     </tr>
@@ -979,7 +1164,7 @@
 
             if (totalPages > 1) {
                 paginationEl.classList.remove('hidden');
-                document.getElementById('modal-page-info').textContent = `Halaman ${currentModalPage} dari ${totalPages} (Total ${currentModalSubmissions.length} Pengumpulan)`;
+                document.getElementById('modal-page-info').textContent = `Halaman ${currentModalPage} dari ${totalPages} (Total ${currentModalSubmissions.length} Siswa)`;
                 
                 document.getElementById('modal-prev-btn').disabled = currentModalPage === 1;
                 document.getElementById('modal-next-btn').disabled = currentModalPage === totalPages;
@@ -988,9 +1173,9 @@
             }
         }
 
-        function onGradeInputChanged(subId) {
-            const inputVal = parseFloat(document.getElementById(`grade-${subId}`).value);
-            const badgeEl = document.getElementById(`letter-badge-${subId}`);
+        function onGradeInputChanged(uniqueKey) {
+            const inputVal = parseFloat(document.getElementById(`grade-${uniqueKey}`).value);
+            const badgeEl = document.getElementById(`letter-badge-${uniqueKey}`);
             if (badgeEl) {
                 badgeEl.textContent = calculateGradeLetter(inputVal);
             }
@@ -1005,17 +1190,103 @@
             document.getElementById('submissions-modal').classList.add('hidden');
         }
 
-        async function saveGrade(subId) {
-            const gradeVal = document.getElementById(`grade-${subId}`).value;
-            const feedbackVal = document.getElementById(`feedback-${subId}`).value.trim();
-            if (gradeVal === '' || isNaN(gradeVal)) { alert('Masukkan nilai angka yang valid!'); return; }
+        async function saveGrade(uniqueKey) {
+            const gradeVal = document.getElementById(`grade-${uniqueKey}`).value;
+            const feedbackVal = document.getElementById(`feedback-${uniqueKey}`).value.trim();
+            
+            if (gradeVal === '' || isNaN(gradeVal)) { 
+                alert('Masukkan nilai angka yang valid!'); 
+                return; 
+            }
 
-            const { error } = await db.from('task_submissions').update({ grade: parseInt(gradeVal), feedback: feedbackVal, status: 'Dinilai' }).eq('id', subId);
-            if (error) {
-                alert('Gagal: ' + error.message);
+            const targetSub = currentModalSubmissions.find(s => s.student_id === uniqueKey);
+            if (!targetSub) return;
+
+            if (targetSub.id) {
+                // Update jika data submission sudah ada
+                const { error } = await db.from('task_submissions').update({ 
+                    grade: parseInt(gradeVal), 
+                    feedback: feedbackVal, 
+                    status: 'Dinilai' 
+                }).eq('id', targetSub.id);
+
+                if (error) alert('Gagal menyimpan: ' + error.message);
+                else {
+                    alert('Nilai berhasil disimpan!');
+                    openSubmissionsModal(activeTaskId, activeTaskTitle, activeTaskClass);
+                }
             } else {
-                alert('Nilai berhasil disimpan!');
+                // Insert baru jika siswa belum memiliki record submission (khusus Junior A & B)
+                const { error } = await db.from('task_submissions').insert([{
+                    task_id: activeTaskId,
+                    student_id: targetSub.student_id,
+                    submission_link: activeTaskClass.includes('junior') ? 'Praktikum Kelas Langsung' : '#',
+                    notes: activeTaskClass.includes('junior') ? 'Hadir & Praktikum' : '-',
+                    grade: parseInt(gradeVal),
+                    feedback: feedbackVal,
+                    status: 'Dinilai'
+                }]);
+
+                if (error) alert('Gagal menyimpan: ' + error.message);
+                else {
+                    alert('Nilai berhasil disimpan!');
+                    openSubmissionsModal(activeTaskId, activeTaskTitle, activeTaskClass);
+                }
+            }
+        }
+
+        async function saveAllGrades() {
+            if (!currentModalSubmissions || currentModalSubmissions.length === 0) {
+                alert('Tidak ada data siswa untuk disimpan.');
+                return;
+            }
+
+            if (!confirm('Yakin ingin menyimpan semua nilai dan feedback yang ada pada halaman/daftar ini?')) {
+                return;
+            }
+
+            try {
+                let successCount = 0;
+
+                for (let sub of currentModalSubmissions) {
+                    const uniqueKey = sub.student_id;
+                    const gradeInput = document.getElementById(`grade-${uniqueKey}`);
+                    const feedbackInput = document.getElementById(`feedback-${uniqueKey}`);
+
+                    if (gradeInput && feedbackInput) {
+                        const gradeVal = gradeInput.value.trim();
+                        const feedbackVal = feedbackInput.value.trim();
+
+                        if (gradeVal !== '' && !isNaN(gradeVal)) {
+                            if (sub.id) {
+                                const { error } = await db.from('task_submissions').update({
+                                    grade: parseInt(gradeVal),
+                                    feedback: feedbackVal,
+                                    status: 'Dinilai'
+                                }).eq('id', sub.id);
+
+                                if (!error) successCount++;
+                            } else {
+                                const { error } = await db.from('task_submissions').insert([{
+                                    task_id: activeTaskId,
+                                    student_id: sub.student_id,
+                                    submission_link: activeTaskClass.includes('junior') ? 'Praktikum Kelas Langsung' : '#',
+                                    notes: activeTaskClass.includes('junior') ? 'Hadir & Praktikum' : '-',
+                                    grade: parseInt(gradeVal),
+                                    feedback: feedbackVal,
+                                    status: 'Dinilai'
+                                }]);
+
+                                if (!error) successCount++;
+                            }
+                        }
+                    }
+                }
+
+                alert(`Berhasil menyimpan ${successCount} data nilai siswa!`);
                 openSubmissionsModal(activeTaskId, activeTaskTitle, activeTaskClass);
+            } catch (error) {
+                alert('Terjadi kesalahan saat menyimpan massal: ' + error.message);
             }
         }
 
@@ -1439,7 +1710,7 @@
 
         async function handleLogout() {
             await db.auth.signOut();
-            window.location.href = '/';
+            window.location.href = 'index.html';
         }
     </script>
 </body>

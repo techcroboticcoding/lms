@@ -96,7 +96,7 @@
 </head>
 <body class="flex flex-col items-center py-4">
 
-    <!-- Tombol Aksi Atas (Tanpa Tombol Kembali, Bersih dari Error Routing) -->
+    <!-- Tombol Aksi Atas -->
     <div class="max-w-[297mm] w-full flex justify-end items-center mb-4 px-4 no-print">
         <div class="flex items-center gap-3">
             <span class="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl">
@@ -207,20 +207,19 @@
             <table class="w-full text-left border-collapse text-xs">
                 <thead>
                     <tr class="border-b-2 border-blue-600/30 text-[10px] font-bold text-blue-950 uppercase tracking-wider bg-blue-50/70">
-                        <th class="py-2.5 px-3 w-[6%] text-center">No</th>
-                        <th class="py-2.5 px-3 w-[36%]">Module Title / Practical Assignment</th>
-                        <th class="py-2.5 px-3 w-[12%] text-center">Numeric Score</th>
-                        <th class="py-2.5 px-3 w-[12%] text-center">Grade</th>
-                        <th class="py-2.5 px-3 w-[34%]">Instructor Feedback / Notes</th>
+                        <th class="py-2.5 px-3 w-[10%] text-center">No</th>
+                        <th class="py-2.5 px-3 w-[50%]">Module Title / Practical Assignment</th>
+                        <th class="py-2.5 px-3 w-[20%] text-center">Numeric Score</th>
+                        <th class="py-2.5 px-3 w-[20%] text-center">Grade</th>
                     </tr>
                 </thead>
                 <tbody id="transcripts-tbody" class="divide-y divide-slate-200">
-                    <tr><td colspan="5" class="py-6 text-center text-slate-500">Loading academic transcript...</td></tr>
+                    <tr><td colspan="4" class="py-6 text-center text-slate-500">Loading academic transcript...</td></tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- Bagian Bawah Transkrip (Tanpa TTD Pengajar) -->
+        <!-- Bagian Bawah Transkrip (Final Average Score & Graduation Predicate Dikembalikan) -->
         <div class="pt-2 flex flex-col relative z-25 text-xs px-3 pb-2 bg-slate-50/75 rounded-b-lg space-y-2">
             <div class="flex justify-between items-center border-t border-slate-200 pt-2">
                 <div class="flex items-center gap-4">
@@ -235,7 +234,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT LOGIKA DATABASE & PENOMORAN URUT ABJAD (DINAMIS DARI AKUN LOGIN / URL PARAMETER) -->
+    <!-- SCRIPT LOGIKA DATABASE & PENOMORAN URUT ABJAD -->
     <script>
         const SUPABASE_URL = 'https://rwuaqlwpieuiqwfotkkz.supabase.co';
         const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ow_W7UPe5i6XkS0phs4btw_3ff3abUt';
@@ -272,7 +271,6 @@
             const urlParams = new URLSearchParams(window.location.search);
             let studentId = urlParams.get('id');
 
-            // Jika dibuka langsung tanpa parameter ?id=..., cek session user yang sedang login saat ini
             if (!studentId) {
                 const { data: { session } } = await db.auth.getSession();
                 if (session) {
@@ -283,7 +281,6 @@
                 }
             }
 
-            // Mengambil Seluruh Profil Siswa untuk Urutan Abjad
             const { data: allStudents } = await db.from('profiles').select('id, created_at').order('created_at', { ascending: true });
             
             let studentSubIndex = 'a';
@@ -300,7 +297,6 @@
             document.getElementById('student-name').textContent = profile.name;
             document.getElementById('student-class').textContent = profile.target_class ? profile.target_class.toUpperCase() : '-';
             
-            // Format Nomor Sertifikat: 157.<abjad>/CERT-CR.YPKS/TECH-C/X/2026
             const currentMonthRoman = "X"; 
             const currentYear = "2026";
             document.getElementById('cert-code-label').textContent = `157.${studentSubIndex}/CERT-CR.YPKS/TECH-C/${currentMonthRoman}/${currentYear}`;
@@ -312,7 +308,7 @@
             const tbody = document.getElementById('transcripts-tbody');
 
             if (!submissions || submissions.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500">No graded assignments yet.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-500">No graded assignments yet.</td></tr>`;
                 document.getElementById('predikat-badge').textContent = 'Active Learner';
                 return;
             }
@@ -331,7 +327,6 @@
                         <td class="py-2 px-3 font-semibold text-slate-800">${title}</td>
                         <td class="py-2 px-3 text-center font-bold text-blue-700">${score}</td>
                         <td class="py-2 px-3 text-center"><span class="px-2.5 py-0.5 text-[9px] font-bold bg-blue-50 text-blue-700 border border-blue-200 rounded-md">${calculateShortLetter(sub.grade)}</span></td>
-                        <td class="py-2 px-3 text-slate-600 italic">${sub.feedback || 'Satisfactory note'}</td>
                     </tr>
                 `;
             });
