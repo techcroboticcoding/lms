@@ -474,7 +474,7 @@
                     gradeInfo = `<div class="mt-2 p-2.5 bg-purple-950/30 border border-purple-500/30 rounded-xl text-xs space-y-1"><p class="font-bold text-purple-300">Nilai: ${mySub.grade} (${letter})</p>${mySub.feedback ? `<p class="text-slate-300 italic">Feedback: "${escapeHtml(mySub.feedback)}"</p>` : ''}</div>`;
                 }
 
-                // Gunakan escapeHtml untuk mencegah kodingan/karakter khusus merusak tombol dan layout
+                // Pengaman escapeHtml agar kodingan tidak merusak layout kartu tugas
                 const safeNotes = mySub && mySub.notes ? escapeHtml(mySub.notes) : '';
                 const safeLink = mySub && mySub.submission_link ? escapeHtml(mySub.submission_link) : '#';
                 const safeDescription = t.description ? t.description.replace(/'/g, "&apos;").replace(/"/g, "&quot;") : 'Tidak ada deskripsi.';
@@ -547,6 +547,13 @@
 
         function openSubmitModal(taskId, existingLink = '', existingNotes = '') {
             document.getElementById('modal-submit-task-id').value = taskId;
+            
+            // Pengaman: Jika link yang tersimpan terdeteksi mengandung kodingan/karakter rusak, kosongkan otomatis agar input bersih
+            let safeLinkValue = existingLink;
+            if (safeLinkValue.includes('{') || safeLinkValue.includes('//') || safeLinkValue.length > 150) {
+                safeLinkValue = ''; 
+            }
+
             document.getElementById('modal-submission-notes').value = existingNotes.replace(/&apos;/g, "'").replace(/&quot;/g, '"');
 
             const container = document.getElementById('submission-input-container');
@@ -560,7 +567,7 @@
             } else {
                 container.innerHTML = `
                     <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Tautan Tugas (Google Drive / GitHub / URL)</label>
-                    <input type="url" id="modal-submission-link" value="${existingLink}" placeholder="https://..." class="w-full px-4 py-3 text-sm text-white placeholder-slate-500 bg-slate-950/60 border border-slate-800 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <input type="url" id="modal-submission-link" value="${safeLinkValue}" placeholder="https://..." class="w-full px-4 py-3 text-sm text-white placeholder-slate-500 bg-slate-950/60 border border-slate-800 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 `;
             }
 
