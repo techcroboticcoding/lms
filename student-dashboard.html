@@ -323,6 +323,17 @@
             }
         });
 
+        // Fungsi pengaman Escape HTML agar kodingan/karakter khusus tidak merusak layout & tombol edit
+        function escapeHtml(unsafe) {
+            if (!unsafe) return '';
+            return String(unsafe)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
         async function loadStudentMaterials() {
             const gridContainer = document.getElementById('student-materials-grid');
             if (!gridContainer || !isApproved) return;
@@ -460,15 +471,29 @@
                 let gradeInfo = '';
                 if (mySub && mySub.grade !== null && mySub.grade !== undefined) {
                     const letter = calculateGradeLetter(mySub.grade);
-                    gradeInfo = `<div class="mt-2 p-2.5 bg-purple-950/30 border border-purple-500/30 rounded-xl text-xs space-y-1"><p class="font-bold text-purple-300">Nilai: ${mySub.grade} (${letter})</p>${mySub.feedback ? `<p class="text-slate-300 italic">Feedback: "${mySub.feedback}"</p>` : ''}</div>`;
+                    gradeInfo = `<div class="mt-2 p-2.5 bg-purple-950/30 border border-purple-500/30 rounded-xl text-xs space-y-1"><p class="font-bold text-purple-300">Nilai: ${mySub.grade} (${letter})</p>${mySub.feedback ? `<p class="text-slate-300 italic">Feedback: "${escapeHtml(mySub.feedback)}"</p>` : ''}</div>`;
                 }
 
-                const safeNotes = mySub && mySub.notes ? mySub.notes.replace(/'/g, "&apos;").replace(/"/g, "&quot;") : '';
+                // Gunakan escapeHtml untuk mencegah kodingan/karakter khusus merusak tombol dan layout
+                const safeNotes = mySub && mySub.notes ? escapeHtml(mySub.notes) : '';
+                const safeLink = mySub && mySub.submission_link ? escapeHtml(mySub.submission_link) : '#';
                 const safeDescription = t.description ? t.description.replace(/'/g, "&apos;").replace(/"/g, "&quot;") : 'Tidak ada deskripsi.';
                 const safeTitle = t.title.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
 
                 if (mySub) {
-                    actionBtn = `<div class="space-y-2"><div class="flex gap-2"><a href="${mySub.submission_link}" target="_blank" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold py-2 px-3 rounded-xl text-center transition truncate"><i class="fa-solid fa-file-arrow-down mr-1"></i> Lihat File/Link</a><button onclick="openSubmitModal('${t.id}', '${mySub.submission_link}', '${safeNotes}')" class="bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white text-xs font-semibold py-2 px-3 rounded-xl transition border border-blue-500/30">Edit</button></div>${gradeInfo}</div>`;
+                    actionBtn = `
+                        <div class="space-y-2">
+                            <div class="flex gap-2">
+                                <a href="${safeLink}" target="_blank" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold py-2 px-3 rounded-xl text-center transition truncate" title="${safeLink}">
+                                    <i class="fa-solid fa-file-arrow-down mr-1"></i> Lihat File/Link
+                                </a>
+                                <button onclick="openSubmitModal('${t.id}', '${safeLink}', '${safeNotes}')" class="bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white text-xs font-semibold py-2 px-3 rounded-xl transition border border-blue-500/30 shrink-0">
+                                    Edit
+                                </button>
+                            </div>
+                            ${gradeInfo}
+                        </div>
+                    `;
                 } else {
                     if (isDeadlinePassed) {
                         actionBtn = `<button disabled class="w-full bg-slate-800/50 text-slate-500 text-xs font-semibold py-2.5 px-4 rounded-xl border border-slate-800 cursor-not-allowed flex items-center justify-center gap-2"><i class="fa-solid fa-clock-rotate-left"></i> Tenggat Telah Lewat</button>`;
@@ -678,7 +703,6 @@
 
             if (certificateAccess) {
                 statusText.textContent = "Selamat! Anda telah dinyatakan lulus dan akses sertifikat telah dibuka oleh pengajar.";
-                // Langsung mengarahkan ke halaman sertifikat.html di tab baru
                 actionArea.innerHTML = `
                     <a href="sertifikat.html" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-6 py-3 rounded-xl shadow-lg shadow-amber-600/30 transition inline-flex items-center gap-2">
                         <i class="fa-solid fa-award text-sm"></i> Lihat & Download Dokumen Kelulusan
