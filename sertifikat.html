@@ -304,11 +304,32 @@
             document.getElementById('trans-name').textContent = profile.name;
             document.getElementById('trans-class').textContent = profile.target_class ? profile.target_class.toUpperCase() : '-';
 
-            const { data: submissions } = await db.from('task_submissions').select(`*, tasks(title)`).eq('student_id', studentId);
+            const studentClass = profile.target_class || 'junior-a';
+            
+            // 1. Ambil SEMUA tugas (tasks) sesuai kelas siswa secara berurutan
+            const { data: allTasks } = await db
+                .from('tasks')
+                .select('*')
+                .eq('target_class', studentClass)
+                .order('created_at', { ascending: true });
+
+            // 2. Ambil data pengumpulan tugas milik siswa
+            const { data: submissions } = await db
+                .from('task_submissions')
+                .select('*')
+                .eq('student_id', studentId);
+
+            const submissionMap = {};
+            if (submissions) {
+                submissions.forEach(sub => {
+                    submissionMap[sub.task_id] = sub;
+                });
+            }
+
             const tbody = document.getElementById('transcripts-tbody');
 
-            if (!submissions || submissions.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-500">No graded assignments yet.</td></tr>`;
+            if (!allTasks || allTasks.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-500">No tasks found for this class.</td></tr>`;
                 document.getElementById('predikat-badge').textContent = 'Active Learner';
                 return;
             }
@@ -316,17 +337,23 @@
             tbody.innerHTML = '';
             let totalScore = 0, count = 0;
 
-            submissions.forEach((sub, i) => {
-                const title = sub.tasks ? sub.tasks.title : 'STREAM Practical';
-                const score = sub.grade ?? '-';
-                if (sub.grade !== null && !isNaN(sub.grade)) { totalScore += sub.grade; count++; }
+            // 3. Tampilkan semua tugas secara berurutan (yang belum dinilai/dikerjakan bernilai '-')
+            allTasks.forEach((task, i) => {
+                const title = task.title || 'Practical Assignment';
+                const sub = submissionMap[task.id];
+                const score = (sub && sub.grade !== null && sub.grade !== undefined) ? sub.grade : '-';
+                
+                if (sub && sub.grade !== null && !isNaN(sub.grade)) {
+                    totalScore += sub.grade;
+                    count++;
+                }
 
                 tbody.innerHTML += `
                     <tr class="align-middle">
-                        <td class="py-2 px-3 text-center text-slate-500 font-medium">${i + 1}</td>
-                        <td class="py-2 px-3 font-semibold text-slate-800">${title}</td>
-                        <td class="py-2 px-3 text-center font-bold text-blue-700">${score}</td>
-                        <td class="py-2 px-3 text-center"><span class="px-2.5 py-0.5 text-[9px] font-bold bg-blue-50 text-blue-700 border border-blue-200 rounded-md">${calculateShortLetter(sub.grade)}</span></td>
+                        <td class="py-2.5 px-3 text-center text-slate-500 font-medium">${i + 1}</td>
+                        <td class="py-2.5 px-3 font-semibold text-slate-800">${title}</td>
+                        <td class="py-2.5 px-3 text-center font-bold text-blue-700">${score}</td>
+                        <td class="py-2.5 px-3 text-center"><span class="px-2.5 py-0.5 text-[9px] font-bold bg-blue-50 text-blue-700 border border-blue-200 rounded-md">${sub ? calculateShortLetter(sub.grade) : '-'}</span></td>
                     </tr>
                 `;
             });
@@ -337,6 +364,10 @@
                 document.getElementById('avg-score').textContent = avg;
                 document.getElementById('final-pred').textContent = `${finalPredikat} (${calculateShortLetter(avg)})`;
                 document.getElementById('predikat-badge').textContent = finalPredikat;
+            } else {
+                document.getElementById('avg-score').textContent = '-';
+                document.getElementById('final-pred').textContent = '-';
+                document.getElementById('predikat-badge').textContent = 'Active Learner';
             }
         });
     </script>
